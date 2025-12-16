@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuthStore } from '@/stores/authStore';
-import { Loader2, Mail, Lock, User, ArrowRight, Sparkles } from 'lucide-react';
+import { Loader2, Mail, Lock, User, ArrowRight, Sparkles, Download } from 'lucide-react';
 import { toast } from 'sonner';
+import { getLocalUserData, migrateLocalDataToSupabase } from '@/lib/syncLocalData';
 
 export function Auth() {
   const navigate = useNavigate();
@@ -19,6 +20,30 @@ export function Auth() {
   const [username, setUsername] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showMigrationOffer, setShowMigrationOffer] = useState(false);
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+  const [isMigrating, setIsMigrating] = useState(false);
+
+  // Check for local data
+  const localData = getLocalUserData();
+
+  const handleMigration = async (shouldMigrate: boolean) => {
+    if (shouldMigrate && pendingUserId) {
+      setIsMigrating(true);
+      const result = await migrateLocalDataToSupabase(pendingUserId);
+      setIsMigrating(false);
+
+      if (result.success && result.migrated) {
+        toast.success(`Migration réussie ! ${result.migrated.xp} XP, ${result.migrated.exercises} exercices récupérés`);
+      } else {
+        toast.error(result.error || 'Erreur lors de la migration');
+      }
+    }
+
+    setShowMigrationOffer(false);
+    setPendingUserId(null);
+    navigate('/dashboard');
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +54,17 @@ export function Auth() {
       toast.error(error);
     } else {
       toast.success('Connexion réussie !');
+
+      // Check if there's local data to migrate
+      if (localData.hasData) {
+        const user = useAuthStore.getState().user;
+        if (user) {
+          setPendingUserId(user.id);
+          setShowMigrationOffer(true);
+          return;
+        }
+      }
+
       navigate('/dashboard');
     }
   };
@@ -73,6 +109,72 @@ export function Auth() {
       setShowForgotPassword(false);
     }
   };
+
+  // Migration offer modal
+  if (showMigrationOffer && localData.user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 to-amber-50 dark:from-slate-900 dark:to-slate-800 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg mb-4">
+              <Download className="w-8 h-8 text-white" />
+            </div>
+            <CardTitle>Données locales détectées !</CardTitle>
+            <CardDescription>
+              Tu as des données de progression en local. Veux-tu les transférer vers ton compte ?
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-secondary/50 rounded-lg p-4 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">XP accumulé</span>
+                <span className="font-semibold text-violet-600">{localData.user.stats.totalXP} XP</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Exercices complétés</span>
+                <span className="font-semibold">{localData.user.stats.totalExercises}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Badges gagnés</span>
+                <span className="font-semibold">{localData.user.earnedBadges?.length || 0}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Niveau</span>
+                <span className="font-semibold">Niveau {localData.user.stats.level}</span>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => handleMigration(false)}
+                disabled={isMigrating}
+              >
+                Non merci
+              </Button>
+              <Button
+                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500"
+                onClick={() => handleMigration(true)}
+                disabled={isMigrating}
+              >
+                {isMigrating ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4 mr-2" />
+                )}
+                Transférer
+              </Button>
+            </div>
+
+            <p className="text-xs text-center text-muted-foreground">
+              Les données locales seront supprimées après le transfert
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (showForgotPassword) {
     return (
