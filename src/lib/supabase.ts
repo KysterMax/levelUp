@@ -4,6 +4,9 @@ import type { Database } from '@/types/database';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Feature flag: set to true when Supabase auth is ready
+const SUPABASE_AUTH_ENABLED = false;
+
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(
     'Supabase credentials not found. Running in offline mode with localStorage.'
@@ -18,7 +21,8 @@ export const supabase: SupabaseClient<Database> = createClient<Database>(
   supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder'
 );
 
-// Helper to check if Supabase is configured
+// Helper to check if Supabase is configured and enabled
 export const isSupabaseConfigured = () => {
-  return !!(supabaseUrl && supabaseAnonKey);
+  // Temporarily disabled - set SUPABASE_AUTH_ENABLED to true when ready
+  return SUPABASE_AUTH_ENABLED && !!(supabaseUrl && supabaseAnonKey);
 };
