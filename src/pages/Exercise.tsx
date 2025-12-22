@@ -69,7 +69,7 @@ export function Exercise() {
     }, 300);
   }, [type, id, getExercise, getNewExercise, getTrainingExercise, startExercise, isTrainingMode, userLevel]);
 
-  const handleComplete = (success: boolean, xpEarned: number, timeSpent: number) => {
+  const handleComplete = async (success: boolean, xpEarned: number, timeSpent: number) => {
     if (!exercise) return;
 
     // Apply daily challenge bonus (+50% XP)
@@ -89,10 +89,7 @@ export function Exercise() {
       completedAt: new Date(),
     };
 
-    // Update user stats
-    completeUserExercise(result);
-
-    // Update exercise store
+    // Update exercise store (sync)
     completeStoreExercise(exercise.id, result.score, timeSpent);
 
     // If daily challenge, mark as completed
@@ -115,10 +112,13 @@ export function Exercise() {
       description: success ? 'Excellent travail !' : 'Continue comme ça !',
     });
 
+    // Update user stats (async) - wait for it to complete
+    await completeUserExercise(result);
+
     // Navigate back to dashboard after a short delay
     setTimeout(() => {
       navigate('/dashboard');
-    }, 2000);
+    }, 1500);
   };
 
   const handleNextExercise = () => {

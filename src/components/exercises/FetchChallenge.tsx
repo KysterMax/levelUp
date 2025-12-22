@@ -197,25 +197,29 @@ export function FetchChallenge({ exercise, onComplete }: FetchChallengeProps) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
       {/* Left Panel - Instructions (1/3) */}
       <Card className="lg:col-span-1">
-        <CardHeader>
-          <div className="flex items-center justify-between">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <Globe className="w-5 h-5 text-blue-500" />
+              <Globe className="w-5 h-5 text-blue-500 flex-shrink-0" />
               <Badge variant="outline">API Challenge</Badge>
             </div>
             <Badge className={METHOD_COLORS[exercise.method]}>
               {exercise.method}
             </Badge>
           </div>
-          <CardTitle>{exercise.title}</CardTitle>
-          <Markdown className="mt-2">{exercise.description}</Markdown>
+          <CardTitle className="text-lg leading-tight">{exercise.title}</CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-0">
+          {/* Description */}
+          <div className="prose prose-sm dark:prose-invert max-w-none">
+            <Markdown>{exercise.description}</Markdown>
+          </div>
+
           {/* Endpoint Info */}
-          <div className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800">
+          <div className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden">
             <p className="text-xs text-muted-foreground mb-1">Endpoint</p>
-            <code className="text-sm font-mono break-all">{exercise.endpoint}</code>
+            <code className="text-xs font-mono break-all block overflow-x-auto">{exercise.endpoint}</code>
           </div>
 
           <Tabs defaultValue="expected">

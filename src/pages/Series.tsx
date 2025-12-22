@@ -329,7 +329,7 @@ export function Series() {
     }
   };
 
-  const handleExerciseComplete = (success: boolean, xp: number, time: number) => {
+  const handleExerciseComplete = async (success: boolean, xp: number, time: number) => {
     if (!series || !exercises[currentIndex]) return;
 
     const exercise = exercises[currentIndex];
@@ -349,15 +349,17 @@ export function Series() {
       attempts: 1,
       completedAt: new Date(),
     };
-    completeExercise(result);
     completeStoreExercise(exercise.id, score, time);
 
+    // Await the async completion to ensure XP is updated
+    await completeExercise(result);
+
     // Move to next exercise or complete series
-    setTimeout(() => {
+    setTimeout(async () => {
       if (currentIndex + 1 >= exercises.length) {
         // Series complete - add bonus XP
         setIsComplete(true);
-        completeExercise({
+        await completeExercise({
           exerciseId: `series-${series.id}`,
           completed: true,
           score: 100,
