@@ -28,7 +28,52 @@ export function Auth() {
         setIsProcessingOAuth(true);
 
         try {
-          // Supabase will automatically handle the OAuth token from the URL
+          // For hash-based tokens (implicit flow), we need to let Supabase parse them
+          // The tokens are in the URL hash, so we need to wait for onAuthStateChange
+          // or manually set the session
+
+          if (hashParams.has('access_token')) {
+            const accessToken = hashParams.get('access_token');
+            const refreshToken = hashParams.get('refresh_token');
+
+            if (accessToken && refreshToken) {
+              // Set the session manually from the hash tokens
+              const { data, error } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+              });
+
+              if (error) {
+                console.error('OAuth session error:', error);
+                toast.error('Erreur lors de la connexion avec GitHub');
+                setIsProcessingOAuth(false);
+                return;
+              }
+
+              if (data.session?.user) {
+                // Clear the hash from URL
+                window.history.replaceState(null, '', window.location.pathname);
+
+                // Fetch user data
+                await fetchProfile();
+                await fetchStats();
+                await fetchSettings();
+
+                toast.success('Connexion avec GitHub réussie !');
+
+                // Redirect based on profile status
+                const currentProfile = useAuthStore.getState().profile;
+                if (currentProfile?.initial_level) {
+                  navigate('/dashboard', { replace: true });
+                } else {
+                  navigate('/onboarding', { replace: true });
+                }
+                return;
+              }
+            }
+          }
+
+          // Fallback: try getSession for code-based flow
           const { data: { session }, error } = await supabase.auth.getSession();
 
           if (error) {
