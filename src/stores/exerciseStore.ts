@@ -32,17 +32,58 @@ const getTodayString = () => {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 };
 
-// Deterministic daily exercise selection based on date
-const getDailyExerciseId = (dateString: string): string => {
-  // Simple hash function to get consistent exercise for each day
+// Simple hash function for deterministic selection
+const hashString = (str: string): number => {
   let hash = 0;
-  for (let i = 0; i < dateString.length; i++) {
-    const char = dateString.charCodeAt(i);
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+    hash = hash & hash;
   }
-  const index = Math.abs(hash) % allExercises.length;
-  return allExercises[index].id;
+  return Math.abs(hash);
+};
+
+// Deterministic daily exercise selection - personalized per user
+const getDailyExerciseId = (
+  dateString: string,
+  userId?: string,
+  userLevel?: Difficulty,
+  completedIds?: Set<string>
+): string => {
+  // Create a seed from date + userId for deterministic but personalized selection
+  const seed = hashString(dateString + (userId || 'anonymous'));
+
+  // Filter exercises based on user context
+  let candidates = [...allExercises];
+
+  // 1. Filter out completed exercises (if provided)
+  if (completedIds && completedIds.size > 0) {
+    const uncompleted = candidates.filter(ex => !completedIds.has(ex.id));
+    if (uncompleted.length > 0) {
+      candidates = uncompleted;
+    }
+    // If all completed, keep all candidates (training mode)
+  }
+
+  // 2. Filter by user level - prioritize exercises at or below user level
+  if (userLevel) {
+    const levelOrder: Difficulty[] = ['junior', 'mid', 'senior'];
+    const userLevelIndex = levelOrder.indexOf(userLevel);
+
+    // Get exercises at user's level or one below
+    const appropriateLevel = candidates.filter(ex => {
+      const exLevelIndex = levelOrder.indexOf(ex.difficulty);
+      return exLevelIndex <= userLevelIndex && exLevelIndex >= userLevelIndex - 1;
+    });
+
+    if (appropriateLevel.length > 0) {
+      candidates = appropriateLevel;
+    }
+  }
+
+  // 3. Use seeded selection for consistency within the day
+  const index = seed % candidates.length;
+  return candidates[index].id;
 };
 
 interface ExerciseState {
@@ -72,7 +113,7 @@ interface ExerciseState {
   getCompletedCountByDifficulty: (difficulty: Difficulty) => number;
 
   // Daily challenge getters
-  getTodayChallenge: () => { exercise: Exercise; completed: boolean; score?: number } | null;
+  getTodayChallenge: (userId?: string, userLevel?: Difficulty) => { exercise: Exercise; completed: boolean; score?: number } | null;
   isDailyChallengeCompleted: () => boolean;
   getDailyChallengeStreak: () => number;
 
@@ -177,21 +218,32 @@ export const useExerciseStore = create<ExerciseState>()(
         }
       },
 
-      // Daily challenge getters
-      getTodayChallenge: () => {
+      // Daily challenge getters - personalized per user
+      getTodayChallenge: (userId?: string, userLevel?: Difficulty) => {
         const today = getTodayString();
-        const exerciseId = getDailyExerciseId(today);
+        const { completedExercises, dailyChallenges } = get();
+
+        // Check if we already have a challenge for today (consistency)
+        const existingChallenge = dailyChallenges.find((dc) => dc.date === today);
+
+        let exerciseId: string;
+
+        if (existingChallenge) {
+          // Use existing challenge for consistency
+          exerciseId = existingChallenge.exerciseId;
+        } else {
+          // Generate new personalized challenge
+          const completedIds = new Set(completedExercises.map(c => c.exerciseId));
+          exerciseId = getDailyExerciseId(today, userId, userLevel, completedIds);
+        }
+
         const exercise = getExerciseById(exerciseId);
-
         if (!exercise) return null;
-
-        const { dailyChallenges } = get();
-        const todayChallenge = dailyChallenges.find((dc) => dc.date === today);
 
         return {
           exercise,
-          completed: todayChallenge?.completed ?? false,
-          score: todayChallenge?.score,
+          completed: existingChallenge?.completed ?? false,
+          score: existingChallenge?.score,
         };
       },
 

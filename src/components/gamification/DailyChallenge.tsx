@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useExerciseStore } from '@/stores/exerciseStore';
+import { useUserStore } from '@/stores/userStore';
 import { Star, Clock, Sparkles, CheckCircle, Code, HelpCircle, Eye, Globe, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -21,10 +22,12 @@ const TYPE_LABELS = {
 };
 
 export function DailyChallenge() {
+  const user = useUserStore((state) => state.user);
   const getTodayChallenge = useExerciseStore((state) => state.getTodayChallenge);
   const getDailyChallengeStreak = useExerciseStore((state) => state.getDailyChallengeStreak);
 
-  const challenge = getTodayChallenge();
+  // Pass user info for personalized challenge selection
+  const challenge = getTodayChallenge(user?.id, user?.initialLevel);
   const streak = getDailyChallengeStreak();
 
   if (!challenge) return null;
