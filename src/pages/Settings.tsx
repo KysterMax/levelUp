@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useUserStore } from '@/stores/userStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { useOnboardingStore } from '@/stores/onboardingStore';
@@ -36,7 +37,7 @@ import { toast } from 'sonner';
 import { setSoundEnabled } from '@/lib/sounds';
 
 export function Settings() {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
   const { updateSettings, resetProgress } = useUserStore();
   const { theme, setTheme } = useThemeStore();
   const { reset: resetOnboarding } = useOnboardingStore();

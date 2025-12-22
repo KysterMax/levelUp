@@ -7,7 +7,8 @@ import { Progress } from '@/components/ui/progress';
 import { PageTransition, StaggerContainer, StaggerItem, HoverScale } from '@/components/ui/animated';
 import { QuizExercise, CodeChallenge, CodeReview, FetchChallenge } from '@/components/exercises';
 import { XPGainAnimation } from '@/components/gamification';
-import { useUserStore } from '@/stores/userStore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useCompleteExercise } from '@/hooks/useCompleteExercise';
 import { useExerciseStore } from '@/stores/exerciseStore';
 import { SERIES_PRESETS } from '@/types/gamification';
 import type { Exercise, ExerciseResult } from '@/types';
@@ -150,27 +151,31 @@ function SeriesProgress({
         </div>
       </div>
 
-      {/* Current exercise */}
+      {/* Current exercise - key forces remount on exercise change */}
       {currentExercise.type === 'quiz' && (
         <QuizExercise
+          key={currentExercise.id}
           exercise={currentExercise}
           onComplete={(correct, xp, time) => handleExerciseComplete(correct, xp, time)}
         />
       )}
       {currentExercise.type === 'challenge' && (
         <CodeChallenge
+          key={currentExercise.id}
           exercise={currentExercise}
           onComplete={(success, xp, time) => handleExerciseComplete(success, xp, time)}
         />
       )}
       {currentExercise.type === 'review' && (
         <CodeReview
+          key={currentExercise.id}
           exercise={currentExercise}
           onComplete={(score, xp, time) => handleExerciseComplete(score >= 80, xp, time)}
         />
       )}
       {currentExercise.type === 'fetch' && (
         <FetchChallenge
+          key={currentExercise.id}
           exercise={currentExercise}
           onComplete={(success, xp, time) => handleExerciseComplete(success, xp, time)}
         />
@@ -260,8 +265,8 @@ function SeriesComplete({
 export function Series() {
   const { seriesId } = useParams<{ seriesId?: string }>();
   const navigate = useNavigate();
-  const user = useUserStore((state) => state.user);
-  const { completeExercise } = useUserStore();
+  const user = useCurrentUser();
+  const { completeExercise } = useCompleteExercise();
   const { getExercises, completeExercise: completeStoreExercise } = useExerciseStore();
 
   const [selectedSeriesId, setSelectedSeriesId] = useState<string | null>(seriesId || null);

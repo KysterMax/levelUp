@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useUserStore } from '@/stores/userStore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useExerciseStore, getTotalExercisesCount } from '@/stores/exerciseStore';
 import { BADGES } from '@/types/gamification';
 import { getBadgeProgress } from '@/hooks/useBadgeChecker';
@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 type FilterType = 'all' | BadgeRarity | 'earned' | 'locked';
 
 export function Achievements() {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
   const { completedExercises } = useExerciseStore();
   const [filter, setFilter] = useState<FilterType>('all');
 

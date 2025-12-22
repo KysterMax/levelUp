@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useExerciseStore, getTotalExercisesCount, getCategoryStats } from '@/stores/exerciseStore';
-import { useUserStore } from '@/stores/userStore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { allExercises } from '@/data/exercises';
 import type { Difficulty, ExerciseCategory } from '@/types';
 
@@ -63,7 +63,7 @@ interface UseProgressReturn {
 export function useProgress(): UseProgressReturn {
   const { completedExercises, getCompletedCount, getCompletedCountByDifficulty, getCompletedCountByType } =
     useExerciseStore();
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
 
   const totalExercises = getTotalExercisesCount();
   const completedCount = getCompletedCount();
@@ -207,7 +207,7 @@ export function useProgress(): UseProgressReturn {
  */
 export function usePathProgress(pathId: string) {
   const { completedExercises } = useExerciseStore();
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
 
   const completedIds = useMemo(
     () => new Set(completedExercises.map((c) => c.exerciseId)),

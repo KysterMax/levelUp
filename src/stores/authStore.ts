@@ -18,6 +18,7 @@ interface AuthState {
   initialize: () => Promise<void>;
   signUp: (email: string, password: string, username: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  signInWithGitHub: () => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
 
@@ -148,6 +149,30 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
 
       set({ isLoading: false });
+      return { error: null };
+    } catch (error) {
+      set({ isLoading: false });
+      return { error: 'Une erreur est survenue' };
+    }
+  },
+
+  signInWithGitHub: async () => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth`,
+        },
+      });
+
+      if (error) {
+        set({ isLoading: false });
+        return { error: translateAuthError(error.message) };
+      }
+
+      // OAuth will redirect, so we don't need to set isLoading to false here
       return { error: null };
     } catch (error) {
       set({ isLoading: false });

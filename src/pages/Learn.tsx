@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { useUserStore } from '@/stores/userStore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useExerciseStore } from '@/stores/exerciseStore';
 import { Lock, BookOpen, Code, Zap, Brain, Palette, TestTube, Globe, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -126,7 +126,7 @@ const ALL_PATHS: LearningPath[] = [
 ];
 
 export function Learn() {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
   const { getExercises, completedExercises } = useExerciseStore();
 
   if (!user) return null;

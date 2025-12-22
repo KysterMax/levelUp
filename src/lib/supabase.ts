@@ -5,7 +5,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Feature flag: set to true when Supabase auth is ready
-const SUPABASE_AUTH_ENABLED = false;
+const SUPABASE_AUTH_ENABLED = true;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(

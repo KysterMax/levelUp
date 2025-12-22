@@ -194,9 +194,9 @@ export function FetchChallenge({ exercise, onComplete }: FetchChallengeProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full max-w-6xl mx-auto">
-      {/* Left Panel - Instructions */}
-      <Card>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
+      {/* Left Panel - Instructions (1/3) */}
+      <Card className="lg:col-span-1">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -342,8 +342,8 @@ export function FetchChallenge({ exercise, onComplete }: FetchChallengeProps) {
         </CardContent>
       </Card>
 
-      {/* Right Panel - Code Editor */}
-      <Card>
+      {/* Right Panel - Code Editor (2/3) */}
+      <Card className="lg:col-span-2">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base">Code</CardTitle>

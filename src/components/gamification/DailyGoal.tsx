@@ -1,4 +1,4 @@
-import { useUserStore } from '@/stores/userStore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Flame, Target, CheckCircle, Zap } from 'lucide-react';
@@ -18,7 +18,7 @@ function getTodayString(): string {
 }
 
 export function DailyGoal({ goalXP = 50, goalExercises = 3, compact = false }: DailyGoalProps) {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
   const [hasAnimated, setHasAnimated] = useState(false);
 
   if (!user) return null;

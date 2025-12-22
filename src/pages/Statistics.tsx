@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/animated';
-import { useUserStore } from '@/stores/userStore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useExerciseStore, getTotalExercisesCount, getCategoryStats } from '@/stores/exerciseStore';
+import { useThemeStore } from '@/stores/themeStore';
 import { getXPForNextLevel } from '@/types/user';
 import {
   BarChart,
@@ -29,9 +30,46 @@ const TYPE_LABELS: Record<string, string> = {
   review: 'Code Review',
 };
 
+// Custom Tooltip Component for better readability
+interface TooltipPayload {
+  name?: string;
+  value?: number;
+  color?: string;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayload[];
+  label?: string;
+  isDark?: boolean;
+}
+
+function CustomTooltip({ active, payload, label, isDark }: CustomTooltipProps) {
+  if (!active || !payload || payload.length === 0) return null;
+
+  return (
+    <div
+      className={`px-3 py-2 rounded-lg shadow-lg border ${
+        isDark
+          ? 'bg-gray-900/95 border-gray-700 text-gray-100'
+          : 'bg-white/95 border-gray-200 text-gray-900'
+      }`}
+    >
+      {label && <p className="font-medium mb-1">{label}</p>}
+      {payload.map((entry: TooltipPayload, index: number) => (
+        <p key={index} className="text-sm" style={{ color: entry.color }}>
+          {entry.name}: <span className="font-semibold">{entry.value}</span>
+        </p>
+      ))}
+    </div>
+  );
+}
+
 export function Statistics() {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
   const { completedExercises, getExercises } = useExerciseStore();
+  const theme = useThemeStore((state) => state.theme);
+  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   if (!user) return null;
 
@@ -247,13 +285,7 @@ export function Statistics() {
                       tick={{ fill: 'currentColor' }}
                       allowDecimals={false}
                     />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px',
-                      }}
-                    />
+                    <Tooltip content={<CustomTooltip isDark={isDark} />} />
                     <Bar
                       dataKey="exercices"
                       fill="#8B5CF6"
@@ -298,13 +330,7 @@ export function Statistics() {
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                        }}
-                      />
+                      <Tooltip content={<CustomTooltip isDark={isDark} />} />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
@@ -343,13 +369,7 @@ export function Statistics() {
                       width={150}
                       tick={{ fill: 'currentColor', fontSize: 12 }}
                     />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px',
-                      }}
-                    />
+                    <Tooltip content={<CustomTooltip isDark={isDark} />} />
                     <Legend />
                     <Bar dataKey="completed" fill="#8B5CF6" name="Complétés" radius={[0, 4, 4, 0]} />
                     <Bar dataKey="score" fill="#22C55E" name="Score (%)" radius={[0, 4, 4, 0]} />

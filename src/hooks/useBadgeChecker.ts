@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useUserStore } from '@/stores/userStore';
 import { BADGES } from '@/types/gamification';
 import type { Badge } from '@/types/gamification';
@@ -9,7 +10,7 @@ import type { Badge } from '@/types/gamification';
  * Should be used in a component that's always mounted (like MainLayout).
  */
 export function useBadgeChecker() {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
   const earnBadge = useUserStore((state) => state.earnBadge);
 
   // Track previously earned badges to detect new ones

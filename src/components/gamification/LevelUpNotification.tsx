@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { levelUpCelebration } from '@/lib/confetti';
-import { useUserStore } from '@/stores/userStore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { sounds } from '@/lib/sounds';
 import { Star, Sparkles } from 'lucide-react';
 
 export function LevelUpNotification() {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
   const [open, setOpen] = useState(false);
   const [displayedLevel, setDisplayedLevel] = useState<number | null>(null);
   const [previousLevel, setPreviousLevel] = useState<number | null>(null);

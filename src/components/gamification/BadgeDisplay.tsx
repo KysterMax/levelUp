@@ -1,4 +1,4 @@
-import { useUserStore } from '@/stores/userStore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { BADGES, type Badge as BadgeType, type BadgeRarity } from '@/types/gamification';
 import { cn } from '@/lib/utils';
 
@@ -39,7 +39,7 @@ function BadgeItem({ badge, earned }: { badge: BadgeType; earned: boolean }) {
 }
 
 export function BadgeDisplay({ className, showAll = false, maxDisplay = 6 }: BadgeDisplayProps) {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
 
   if (!user) return null;
 

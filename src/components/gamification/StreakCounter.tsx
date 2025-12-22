@@ -1,4 +1,4 @@
-import { useUserStore } from '@/stores/userStore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Flame, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -8,7 +8,7 @@ interface StreakCounterProps {
 }
 
 export function StreakCounter({ className, size = 'md' }: StreakCounterProps) {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
 
   if (!user) return null;
 

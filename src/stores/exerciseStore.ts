@@ -8,7 +8,12 @@ import {
   getExercisesByCategory,
   getRandomExercise,
 } from '@/data/exercises';
-import type { Exercise, Difficulty } from '@/types';
+import type { Exercise, Difficulty, QuizExercise } from '@/types';
+import {
+  generateRandomQuiz,
+  generateDailyQuiz,
+  generatePracticeSession,
+} from '@/lib/exerciseGenerator';
 
 interface CompletedExercise {
   exerciseId: string;
@@ -140,6 +145,11 @@ interface ExerciseState {
   ) => Exercise | undefined;
   getUncompletedCount: () => number;
   getCompletedExercisesList: () => Exercise[];
+
+  // Generated exercises
+  getGeneratedQuiz: (difficulty?: Difficulty) => QuizExercise;
+  getGeneratedDailyQuiz: () => QuizExercise;
+  getGeneratedPracticeSession: (difficulty: Difficulty, count?: number) => QuizExercise[];
 }
 
 export const useExerciseStore = create<ExerciseState>()(
@@ -419,6 +429,19 @@ export const useExerciseStore = create<ExerciseState>()(
         const { completedExercises } = get();
         const completedIds = new Set(completedExercises.map((c) => c.exerciseId));
         return allExercises.filter((ex) => completedIds.has(ex.id));
+      },
+
+      // Generated exercises - creates new unique exercises dynamically
+      getGeneratedQuiz: (difficulty) => {
+        return generateRandomQuiz({ difficulty });
+      },
+
+      getGeneratedDailyQuiz: () => {
+        return generateDailyQuiz();
+      },
+
+      getGeneratedPracticeSession: (difficulty, count = 5) => {
+        return generatePracticeSession(difficulty, count);
       },
     }),
     {

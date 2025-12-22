@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { QuizExercise, CodeChallenge, CodeReview, FetchChallenge } from '@/components/exercises';
 import { XPGainAnimation } from '@/components/gamification';
-import { useUserStore } from '@/stores/userStore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useCompleteExercise } from '@/hooks/useCompleteExercise';
 import { useExerciseStore } from '@/stores/exerciseStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,8 +16,8 @@ export function Exercise() {
   const { type, id } = useParams<{ type?: string; id?: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const user = useUserStore((state) => state.user);
-  const { completeExercise: completeUserExercise } = useUserStore();
+  const user = useCurrentUser();
+  const { completeExercise: completeUserExercise } = useCompleteExercise();
   const {
     getExercise,
     getNewExercise,

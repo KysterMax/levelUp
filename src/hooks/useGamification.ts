@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useUserStore } from '@/stores/userStore';
 import { useExerciseStore } from '@/stores/exerciseStore';
 import { BADGES, XP_REWARDS } from '@/types/gamification';
@@ -52,7 +53,7 @@ interface UseGamificationReturn {
  * Tracks XP, levels, badges, streaks, and provides animation triggers
  */
 export function useGamification(): UseGamificationReturn {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
   const { earnBadge } = useUserStore();
   const { getCompletedCount, getDailyChallengeStreak } = useExerciseStore();
 

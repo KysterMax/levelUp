@@ -1,4 +1,4 @@
-import { useUserStore } from '@/stores/userStore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { UserLevel } from '@/types';
@@ -38,7 +38,7 @@ const LEVEL_CONFIG: Record<UserLevel, { label: string; emoji: string; color: str
 };
 
 export function LevelIndicator({ className, showTitle = true, size = 'md' }: LevelIndicatorProps) {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
 
   if (!user) return null;
 

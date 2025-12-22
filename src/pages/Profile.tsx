@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useUserStore } from '@/stores/userStore';
 import { useExerciseStore, getTotalExercisesCount } from '@/stores/exerciseStore';
 import { XPBar, LevelIndicator, BadgeDisplay } from '@/components/gamification';
@@ -24,7 +25,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 export function Profile() {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
   const resetProgress = useUserStore((state) => state.resetProgress);
   const { completedExercises, getCompletedCountByType } = useExerciseStore();
   const navigate = useNavigate();

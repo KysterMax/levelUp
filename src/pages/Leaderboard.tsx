@@ -3,43 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageTransition, StaggerContainer, StaggerItem } from '@/components/ui/animated';
-import { useUserStore } from '@/stores/userStore';
-import { Trophy, Medal, Flame, Zap, Crown, TrendingUp, Users } from 'lucide-react';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useLeaderboard } from '@/hooks/useLeaderboard';
+import { Trophy, Medal, Flame, Zap, Crown, TrendingUp, Users, Loader2, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { LeaderboardEntry } from '@/types/gamification';
-
-// Mock leaderboard data - simulates other users
-const MOCK_LEADERBOARD: LeaderboardEntry[] = [
-  { rank: 1, userId: 'user_1', username: 'CodeMaster', xp: 15420, level: 28, streak: 45 },
-  { rank: 2, userId: 'user_2', username: 'AlgoNinja', xp: 12850, level: 24, streak: 32 },
-  { rank: 3, userId: 'user_3', username: 'DevQueen', xp: 11200, level: 22, streak: 28 },
-  { rank: 4, userId: 'user_4', username: 'ByteRunner', xp: 9800, level: 20, streak: 21 },
-  { rank: 5, userId: 'user_5', username: 'ReactPro', xp: 8500, level: 18, streak: 18 },
-  { rank: 6, userId: 'user_6', username: 'TypeScriptFan', xp: 7200, level: 16, streak: 14 },
-  { rank: 7, userId: 'user_7', username: 'AsyncAwait', xp: 6100, level: 14, streak: 12 },
-  { rank: 8, userId: 'user_8', username: 'CleanCoder', xp: 5400, level: 13, streak: 9 },
-  { rank: 9, userId: 'user_9', username: 'BugHunter', xp: 4800, level: 12, streak: 7 },
-  { rank: 10, userId: 'user_10', username: 'JuniorDev', xp: 4200, level: 11, streak: 5 },
-  { rank: 11, userId: 'user_11', username: 'StackOverflow', xp: 3600, level: 10, streak: 4 },
-  { rank: 12, userId: 'user_12', username: 'GitMaster', xp: 3100, level: 9, streak: 3 },
-  { rank: 13, userId: 'user_13', username: 'CSSWizard', xp: 2700, level: 8, streak: 2 },
-  { rank: 14, userId: 'user_14', username: 'NodeRunner', xp: 2300, level: 7, streak: 2 },
-  { rank: 15, userId: 'user_15', username: 'APIBuilder', xp: 1900, level: 6, streak: 1 },
-];
-
-// Weekly leaderboard (subset with different order)
-const MOCK_WEEKLY: LeaderboardEntry[] = [
-  { rank: 1, userId: 'user_3', username: 'DevQueen', xp: 1850, level: 22, streak: 7 },
-  { rank: 2, userId: 'user_7', username: 'AsyncAwait', xp: 1620, level: 14, streak: 7 },
-  { rank: 3, userId: 'user_1', username: 'CodeMaster', xp: 1480, level: 28, streak: 7 },
-  { rank: 4, userId: 'user_5', username: 'ReactPro', xp: 1200, level: 18, streak: 5 },
-  { rank: 5, userId: 'user_2', username: 'AlgoNinja', xp: 980, level: 24, streak: 4 },
-  { rank: 6, userId: 'user_8', username: 'CleanCoder', xp: 850, level: 13, streak: 6 },
-  { rank: 7, userId: 'user_4', username: 'ByteRunner', xp: 720, level: 20, streak: 3 },
-  { rank: 8, userId: 'user_6', username: 'TypeScriptFan', xp: 650, level: 16, streak: 4 },
-  { rank: 9, userId: 'user_10', username: 'JuniorDev', xp: 580, level: 11, streak: 5 },
-  { rank: 10, userId: 'user_9', username: 'BugHunter', xp: 450, level: 12, streak: 2 },
-];
 
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) {
@@ -91,9 +60,17 @@ function LeaderboardRow({
       <RankBadge rank={entry.rank} />
 
       {/* Avatar */}
-      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white font-medium">
-        {entry.username.charAt(0).toUpperCase()}
-      </div>
+      {entry.avatarUrl ? (
+        <img
+          src={entry.avatarUrl}
+          alt={entry.username}
+          className="w-10 h-10 rounded-full object-cover"
+        />
+      ) : (
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white font-medium">
+          {entry.username.charAt(0).toUpperCase()}
+        </div>
+      )}
 
       {/* User Info */}
       <div className="flex-1 min-w-0">
@@ -141,9 +118,13 @@ function TopThree({ entries }: { entries: LeaderboardEntry[] }) {
       {/* Second Place */}
       {second && (
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white text-xl font-bold mb-2">
-            {second.username.charAt(0)}
-          </div>
+          {second.avatarUrl ? (
+            <img src={second.avatarUrl} alt={second.username} className="w-16 h-16 rounded-full object-cover mb-2" />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white text-xl font-bold mb-2">
+              {second.username.charAt(0)}
+            </div>
+          )}
           <span className="font-medium text-sm truncate max-w-[80px]">{second.username}</span>
           <div className="flex items-center gap-1 text-amber-500 text-sm font-medium">
             <Zap className="w-3 h-3" />
@@ -159,9 +140,13 @@ function TopThree({ entries }: { entries: LeaderboardEntry[] }) {
       {first && (
         <div className="flex flex-col items-center -mt-4">
           <Crown className="w-8 h-8 text-yellow-500 mb-1" />
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center text-white text-2xl font-bold mb-2 ring-4 ring-yellow-200 dark:ring-yellow-900">
-            {first.username.charAt(0)}
-          </div>
+          {first.avatarUrl ? (
+            <img src={first.avatarUrl} alt={first.username} className="w-20 h-20 rounded-full object-cover mb-2 ring-4 ring-yellow-200 dark:ring-yellow-900" />
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center text-white text-2xl font-bold mb-2 ring-4 ring-yellow-200 dark:ring-yellow-900">
+              {first.username.charAt(0)}
+            </div>
+          )}
           <span className="font-bold truncate max-w-[100px]">{first.username}</span>
           <div className="flex items-center gap-1 text-amber-500 font-bold">
             <Zap className="w-4 h-4" />
@@ -176,9 +161,13 @@ function TopThree({ entries }: { entries: LeaderboardEntry[] }) {
       {/* Third Place */}
       {third && (
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-600 to-amber-700 flex items-center justify-center text-white text-xl font-bold mb-2">
-            {third.username.charAt(0)}
-          </div>
+          {third.avatarUrl ? (
+            <img src={third.avatarUrl} alt={third.username} className="w-16 h-16 rounded-full object-cover mb-2" />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-600 to-amber-700 flex items-center justify-center text-white text-xl font-bold mb-2">
+              {third.username.charAt(0)}
+            </div>
+          )}
           <span className="font-medium text-sm truncate max-w-[80px]">{third.username}</span>
           <div className="flex items-center gap-1 text-amber-500 text-sm font-medium">
             <Zap className="w-3 h-3" />
@@ -194,18 +183,31 @@ function TopThree({ entries }: { entries: LeaderboardEntry[] }) {
 }
 
 export function Leaderboard() {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
   const [activeTab, setActiveTab] = useState('all-time');
+  const {
+    allTimeLeaderboard: fetchedAllTime,
+    weeklyLeaderboard: fetchedWeekly,
+    isLoading,
+    currentUserId,
+    refetch,
+  } = useLeaderboard();
 
   if (!user) return null;
 
-  // Insert current user into leaderboard
-  const insertUserIntoLeaderboard = (leaderboard: LeaderboardEntry[], isWeekly = false) => {
-    const userXP = isWeekly ? Math.floor(user.stats.totalXP * 0.1) : user.stats.totalXP; // Mock weekly XP
+  // Insert current user into leaderboard if not already present (for mock mode)
+  const insertUserIntoLeaderboard = (leaderboard: LeaderboardEntry[], isWeekly = false): LeaderboardEntry[] => {
+    // Si l'utilisateur est déjà dans le classement (mode Supabase), ne pas l'ajouter
+    if (currentUserId && leaderboard.some(e => e.userId === currentUserId)) {
+      return leaderboard;
+    }
+
+    const userXP = isWeekly ? Math.floor(user.stats.totalXP * 0.1) : user.stats.totalXP;
     const userEntry: LeaderboardEntry = {
       rank: 0,
       userId: 'current_user',
       username: user.username,
+      avatarUrl: user.avatarUrl,
       xp: userXP,
       level: user.stats.level,
       streak: user.stats.currentStreak,
@@ -216,11 +218,25 @@ export function Leaderboard() {
     return sorted.map((entry, index) => ({ ...entry, rank: index + 1 }));
   };
 
-  const allTimeLeaderboard = insertUserIntoLeaderboard(MOCK_LEADERBOARD);
-  const weeklyLeaderboard = insertUserIntoLeaderboard(MOCK_WEEKLY, true);
+  const allTimeLeaderboard = insertUserIntoLeaderboard(fetchedAllTime);
+  const weeklyLeaderboard = insertUserIntoLeaderboard(fetchedWeekly, true);
 
-  const currentUserRankAllTime = allTimeLeaderboard.find((e) => e.userId === 'current_user')?.rank || 0;
-  const currentUserRankWeekly = weeklyLeaderboard.find((e) => e.userId === 'current_user')?.rank || 0;
+  // Trouver le rang de l'utilisateur actuel
+  const currentUserIdToFind = currentUserId || 'current_user';
+  const currentUserRankAllTime = allTimeLeaderboard.find((e) => e.userId === currentUserIdToFind)?.rank || 0;
+  const currentUserRankWeekly = weeklyLeaderboard.find((e) => e.userId === currentUserIdToFind)?.rank || 0;
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <PageTransition className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Chargement du classement...</p>
+        </div>
+      </PageTransition>
+    );
+  }
 
   return (
     <PageTransition className="space-y-6">
@@ -232,6 +248,10 @@ export function Leaderboard() {
           </h1>
           <p className="text-muted-foreground">Compare-toi aux autres développeurs</p>
         </div>
+        <Button variant="outline" size="sm" onClick={() => refetch()}>
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Actualiser
+        </Button>
       </div>
 
       {/* User's Current Rank Summary */}
@@ -302,7 +322,7 @@ export function Leaderboard() {
                 <LeaderboardRow
                   key={entry.userId}
                   entry={entry}
-                  isCurrentUser={entry.userId === 'current_user'}
+                  isCurrentUser={entry.userId === currentUserIdToFind}
                 />
               ))}
             </CardContent>
@@ -330,7 +350,7 @@ export function Leaderboard() {
                 <LeaderboardRow
                   key={entry.userId}
                   entry={entry}
-                  isCurrentUser={entry.userId === 'current_user'}
+                  isCurrentUser={entry.userId === currentUserIdToFind}
                   showWeeklyXP
                 />
               ))}

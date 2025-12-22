@@ -1,5 +1,5 @@
 import { Progress } from '@/components/ui/progress';
-import { useUserStore } from '@/stores/userStore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { getXPForNextLevel } from '@/types/user';
 import { Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -10,7 +10,7 @@ interface XPBarProps {
 }
 
 export function XPBar({ className, showDetails = true }: XPBarProps) {
-  const user = useUserStore((state) => state.user);
+  const user = useCurrentUser();
 
   if (!user) return null;
 
