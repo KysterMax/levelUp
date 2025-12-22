@@ -6,20 +6,18 @@ export const challengeExercises: CodeChallenge[] = [
     id: 'challenge_001',
     type: 'challenge',
     title: 'Binary Search',
-    description: `Objectif : Implémente l'algorithme de recherche binaire (dichotomie).
+    description: `**Objectif**
 
-Contexte : Tu reçois un tableau de nombres DÉJÀ TRIÉ en ordre croissant et une valeur cible.
+Implémente la recherche binaire sur un tableau trié.
 
-Ce que tu dois faire :
-1. Trouve l'index de la valeur cible dans le tableau
-2. Si la valeur n'existe pas, retourne -1
+**Ce que tu dois faire**
 
-Principe de la recherche binaire :
-- Compare la cible avec l'élément du milieu
-- Si égal → trouvé !
-- Si cible < milieu → cherche dans la moitié gauche
-- Si cible > milieu → cherche dans la moitié droite
-- Répète jusqu'à trouver ou épuiser les options`,
+- Trouve l'index de la valeur cible
+- Retourne \`-1\` si absente
+
+**Principe**
+
+Compare avec le milieu, puis cherche à gauche ou droite selon le résultat.`,
     starterCode: `function binarySearch(arr: number[], target: number): number {
   // arr est trié en ordre croissant
   // Retourne l'index de target, ou -1 si non trouvé
@@ -65,19 +63,13 @@ Principe de la recherche binaire :
     id: 'challenge_002',
     type: 'challenge',
     title: 'Reverse String',
-    description: `Objectif : Inverse une chaîne de caractères.
+    description: `**Objectif**
 
-Ce que tu dois faire :
-- Prends une chaîne comme "hello"
-- Retourne la chaîne inversée : "olleh"
+Inverse une chaîne de caractères sans utiliser \`.reverse()\`.
 
-Contrainte : Tu ne peux PAS utiliser la méthode .reverse()
+**Exemple**
 
-Exemples :
-- "hello" → "olleh"
-- "world" → "dlrow"
-- "a" → "a"
-- "" → ""`,
+\`"hello"\` → \`"olleh"\``,
     starterCode: `function reverseString(str: string): string {
   // Retourne la chaîne inversée
   // Interdit d'utiliser .reverse()
@@ -112,8 +104,13 @@ Exemples :
     id: 'challenge_003',
     type: 'challenge',
     title: 'FizzBuzz',
-    description:
-      'Retourne un tableau de 1 à n où les multiples de 3 sont "Fizz", de 5 sont "Buzz", et des deux sont "FizzBuzz".',
+    description: `**Objectif**
+
+Retourne un tableau de 1 à n selon ces règles :
+- Multiple de 3 → \`"Fizz"\`
+- Multiple de 5 → \`"Buzz"\`
+- Multiple de 3 ET 5 → \`"FizzBuzz"\`
+- Sinon → le nombre`,
     starterCode: `function fizzBuzz(n: number): (string | number)[] {
   // Retourne un tableau de 1 à n
   // Multiple de 3 -> "Fizz"
@@ -168,21 +165,15 @@ Exemples :
     id: 'challenge_004',
     type: 'challenge',
     title: 'Two Sum',
-    description: `Objectif : Trouve deux nombres dont la somme égale une valeur cible.
+    description: `**Objectif**
 
-Ce que tu reçois :
-- Un tableau de nombres (nums)
-- Une valeur cible (target)
+Trouve les indices de deux nombres dont la somme égale \`target\`.
 
-Ce que tu dois retourner :
-- Les INDICES (positions) des deux nombres dont la somme = target
-- Il existe toujours exactement une solution
+**Exemple**
 
-Exemple :
-nums = [2, 7, 11, 15], target = 9
-→ Retourne [0, 1] car nums[0] + nums[1] = 2 + 7 = 9
+\`nums = [2, 7, 11, 15], target = 9\` → \`[0, 1]\` car 2 + 7 = 9
 
-Astuce : Une HashMap peut t'aider à optimiser !`,
+Il existe toujours une solution unique.`,
     starterCode: `function twoSum(nums: number[], target: number): number[] {
   // Retourne les indices des deux nombres
   // dont la somme égale target
@@ -225,7 +216,15 @@ Astuce : Une HashMap peut t'aider à optimiser !`,
     id: 'challenge_005',
     type: 'challenge',
     title: 'Palindrome Check',
-    description: 'Vérifie si une chaîne est un palindrome (ignore la casse et les espaces).',
+    description: `**Objectif**
+
+Vérifie si une chaîne est un palindrome (se lit pareil à l'endroit et à l'envers).
+
+**Règles**
+
+- Ignore la casse et les espaces
+- \`"racecar"\` → \`true\`
+- \`"A man a plan a canal Panama"\` → \`true\``,
     starterCode: `function isPalindrome(str: string): boolean {
   // Retourne true si str est un palindrome
   // Ignore la casse et les espaces
@@ -271,21 +270,17 @@ Astuce : Une HashMap peut t'aider à optimiser !`,
     id: 'challenge_006',
     type: 'challenge',
     title: 'Merge Sort',
-    description: `Objectif : Implémente l'algorithme de tri fusion (Merge Sort).
+    description: `**Objectif**
 
-Principe "Diviser pour régner" :
-1. DIVISER : Coupe le tableau en deux moitiés
-2. CONQUÉRIR : Trie récursivement chaque moitié
-3. FUSIONNER : Combine les deux moitiés triées
+Implémente le tri fusion (Merge Sort).
 
-Comment fusionner deux tableaux triés :
-- Compare les premiers éléments de chaque tableau
-- Prends le plus petit, ajoute-le au résultat
-- Répète jusqu'à ce que tous les éléments soient ajoutés
+**Principe**
 
-Cas de base : Un tableau de 0 ou 1 élément est déjà trié.
+1. Divise le tableau en deux
+2. Trie récursivement chaque moitié
+3. Fusionne les deux moitiés triées
 
-Exemple : [3, 1, 4, 1] → [1, 1] + [3, 4] → [1, 1, 3, 4]`,
+Cas de base : tableau de 0 ou 1 élément = déjà trié.`,
     starterCode: `function mergeSort(arr: number[]): number[] {
   // Implémente le tri fusion
   // Divise, trie récursivement, fusionne
@@ -337,7 +332,13 @@ function merge(left: number[], right: number[]): number[] {
     id: 'challenge_007',
     type: 'challenge',
     title: 'Quick Sort',
-    description: 'Implémente l\'algorithme de tri rapide (Quick Sort).',
+    description: `**Objectif**
+Implémente le **tri rapide** (Quick Sort).
+
+**Principe**
+1. Choisis un pivot
+2. Éléments \`< pivot\` à gauche, \`> pivot\` à droite
+3. Récursion sur les deux parties`,
     starterCode: `function quickSort(arr: number[]): number[] {
   // Implémente le tri rapide
   // Choisis un pivot, partitionne, trie récursivement
@@ -381,7 +382,13 @@ function merge(left: number[], right: number[]): number[] {
     id: 'challenge_008',
     type: 'challenge',
     title: 'Fibonacci avec Mémoïsation',
-    description: 'Calcule le n-ième nombre de Fibonacci avec mémoïsation.',
+    description: `**Objectif**
+Calcule le **n-ième nombre de Fibonacci** avec **mémoïsation**.
+
+**Formule**
+\`F(0) = 0, F(1) = 1, F(n) = F(n-1) + F(n-2)\`
+
+La mémoïsation évite les recalculs (O(n) au lieu de O(2^n)).`,
     starterCode: `function fibonacci(n: number): number {
   // Retourne le n-ième nombre de Fibonacci
   // Utilise la mémoïsation pour optimiser
@@ -423,26 +430,14 @@ function merge(left: number[], right: number[]): number[] {
     id: 'challenge_009',
     type: 'challenge',
     title: 'Valid Parentheses',
-    description: `Objectif : Vérifie si une chaîne de parenthèses est valide (bien équilibrée).
+    description: `**Objectif**
+Vérifie si les parenthèses \`()\`, \`[]\`, \`{}\` sont **bien équilibrées**.
 
-Types de parenthèses supportés : (), [], {}
-
-Règles pour être valide :
-1. Chaque parenthèse ouvrante doit avoir une fermante correspondante
-2. Les parenthèses doivent être fermées dans le bon ordre
-3. Pas de fermante avant son ouvrante
-
-Exemples valides :
-- "()" → true
-- "()[]{}" → true
-- "{[]}" → true (imbrication correcte)
-
-Exemples invalides :
-- "(]" → false (mauvaise correspondance)
-- "([)]" → false (croisement interdit)
-- "(" → false (non fermée)
-
-Astuce : Utilise une pile (stack) !`,
+**Exemples**
+- \`"()[]{}"\` → \`true\`
+- \`"{[]}"\` → \`true\`
+- \`"(]"\` → \`false\`
+- \`"([)]"\` → \`false\``,
     starterCode: `function isValid(s: string): boolean {
   // Vérifie si les parenthèses sont équilibrées
   // Types: (), [], {}
@@ -493,7 +488,12 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_010',
     type: 'challenge',
     title: 'LRU Cache',
-    description: 'Implémente un cache LRU (Least Recently Used) avec get et put en O(1).',
+    description: `**Objectif**
+Implémente un cache **LRU** (Least Recently Used) en **O(1)**.
+
+**Méthodes**
+- \`get(key)\` : retourne la valeur ou \`-1\`
+- \`put(key, value)\` : insère/met à jour, évince le plus ancien si plein`,
     starterCode: `class LRUCache {
   constructor(capacity: number) {
     // Initialise le cache avec la capacité donnée
@@ -559,7 +559,13 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_011',
     type: 'challenge',
     title: 'Longest Substring Without Repeating',
-    description: 'Trouve la longueur de la plus longue sous-chaîne sans caractères répétés.',
+    description: `**Objectif**
+Trouve la longueur de la plus longue **sous-chaîne sans répétition**.
+
+**Exemples**
+- \`"abcabcbb"\` → \`3\` (abc)
+- \`"bbbbb"\` → \`1\`
+- \`"pwwkew"\` → \`3\` (wke)`,
     starterCode: `function lengthOfLongestSubstring(s: string): number {
   // Retourne la longueur de la plus longue sous-chaîne
   // sans caractères qui se répètent
@@ -603,7 +609,11 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_012',
     type: 'challenge',
     title: 'Debounce Function',
-    description: 'Implémente une fonction debounce qui limite les appels répétés.',
+    description: `**Objectif**
+Implémente **debounce** : attend un délai après le dernier appel avant d'exécuter.
+
+**Utilisation**
+Recherche en temps réel, resize, scroll - évite les appels trop fréquents.`,
     starterCode: `function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
@@ -654,7 +664,13 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_013',
     type: 'challenge',
     title: 'Count Vowels',
-    description: 'Compte le nombre de voyelles dans une chaîne.',
+    description: `**Objectif**
+Compte le nombre de **voyelles** (a, e, i, o, u) dans une chaîne.
+
+**Exemples**
+- \`"hello"\` → \`2\`
+- \`"AEIOU"\` → \`5\`
+- \`"rhythm"\` → \`0\``,
     starterCode: `function countVowels(str: string): number {
   // Compte les voyelles (a, e, i, o, u)
   // Insensible à la casse
@@ -686,7 +702,13 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_014',
     type: 'challenge',
     title: 'Find Maximum',
-    description: 'Trouve le plus grand nombre dans un tableau sans utiliser Math.max.',
+    description: `**Objectif**
+Trouve le **plus grand nombre** dans un tableau **sans utiliser Math.max()**.
+
+**Exemples**
+- \`[1, 5, 3, 9, 2]\` → \`9\`
+- \`[-5, -1, -10]\` → \`-1\`
+- \`[]\` → \`-Infinity\``,
     starterCode: `function findMax(arr: number[]): number {
   // Trouve le maximum sans Math.max
   // Retourne -Infinity si tableau vide
@@ -725,7 +747,12 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_015',
     type: 'challenge',
     title: 'Remove Duplicates',
-    description: 'Supprime les doublons d\'un tableau en préservant l\'ordre.',
+    description: `**Objectif**
+Supprime les **doublons** d'un tableau en préservant l'ordre.
+
+**Exemples**
+- \`[1, 2, 2, 3, 3, 3]\` → \`[1, 2, 3]\`
+- \`[1, 2, 1, 2, 1]\` → \`[1, 2]\``,
     starterCode: `function removeDuplicates(arr: number[]): number[] {
   // Retourne un nouveau tableau sans doublons
   // Préserve l'ordre d'apparition
@@ -761,7 +788,12 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_016',
     type: 'challenge',
     title: 'Capitalize Words',
-    description: 'Met en majuscule la première lettre de chaque mot.',
+    description: `**Objectif**
+Met en **majuscule** la première lettre de chaque mot.
+
+**Exemples**
+- \`"hello world"\` → \`"Hello World"\`
+- \`"javaScript is fun"\` → \`"JavaScript Is Fun"\``,
     starterCode: `function capitalizeWords(str: string): string {
   // Capitalise la première lettre de chaque mot
   // "hello world" -> "Hello World"
@@ -797,7 +829,12 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_017',
     type: 'challenge',
     title: 'Flatten Array',
-    description: 'Aplatis un tableau imbriqué sur un niveau.',
+    description: `**Objectif**
+Aplatis un tableau imbriqué sur **un niveau**.
+
+**Exemples**
+- \`[[1, 2], [3, 4]]\` → \`[1, 2, 3, 4]\`
+- \`[1, [2, 3], 4]\` → \`[1, 2, 3, 4]\``,
     starterCode: `function flatten(arr: any[]): any[] {
   // Aplatis le tableau sur un niveau
   // [[1, 2], [3, 4]] -> [1, 2, 3, 4]
@@ -830,7 +867,12 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_018',
     type: 'challenge',
     title: 'Group By',
-    description: 'Groupe les éléments d\'un tableau par une propriété.',
+    description: `**Objectif**
+Groupe les éléments d'un tableau par une propriété.
+
+**Exemple**
+\`groupBy([{type: 1}, {type: 2}, {type: 1}], 'type')\`
+→ \`{ '1': [...], '2': [...] }\``,
     starterCode: `function groupBy<T>(arr: T[], key: keyof T): Record<string, T[]> {
   // Groupe les éléments par la valeur de 'key'
   // [{name: 'a', type: 1}, {name: 'b', type: 1}]
@@ -870,7 +912,10 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_019',
     type: 'challenge',
     title: 'Deep Clone',
-    description: 'Clone profondément un objet sans utiliser JSON.',
+    description: `**Objectif**
+Clone profondément un objet **sans utiliser JSON**.
+
+Gère les objets et tableaux imbriqués.`,
     starterCode: `function deepClone<T>(obj: T): T {
   // Clone profondément l'objet
   // Gère les objets et tableaux imbriqués
@@ -923,7 +968,10 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_020',
     type: 'challenge',
     title: 'Throttle Function',
-    description: 'Implémente une fonction throttle qui limite les appels.',
+    description: `**Objectif**
+Implémente **throttle** : exécute au maximum une fois par intervalle.
+
+Contrairement à debounce, throttle garantit une exécution régulière.`,
     starterCode: `function throttle<T extends (...args: any[]) => any>(
   func: T,
   limit: number
@@ -968,7 +1016,11 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_021',
     type: 'challenge',
     title: 'Curry Function',
-    description: 'Implémente une fonction curry.',
+    description: `**Objectif**
+Implémente **curry** : transforme une fonction en version curryfiée.
+
+**Exemple**
+\`curry(add)(1)(2)\` === \`add(1, 2)\``,
     starterCode: `function curry(fn: (...args: any[]) => any): (...args: any[]) => any {
   // Retourne une version curryfiée de fn
   // curry(add)(1)(2) === add(1, 2)
@@ -1007,13 +1059,12 @@ Astuce : Utilise une pile (stack) !`,
     id: 'challenge_ts_001',
     type: 'challenge',
     title: 'Typer une fonction',
-    description: `Objectif : Ajoute les types TypeScript à cette fonction qui calcule la somme de deux nombres.
+    description: `**Objectif**
+Ajoute les **types TypeScript** à cette fonction qui calcule la somme de deux nombres.
 
-Ce que tu dois faire :
-1. Ajoute le type des paramètres a et b (ce sont des nombres)
-2. Ajoute le type de retour de la fonction
-
-La fonction doit retourner la somme de a et b.`,
+**Ce que tu dois faire**
+- Type des paramètres \`a\` et \`b\` → \`number\`
+- Type de retour → \`number\``,
     starterCode: `// Ajoute les types aux paramètres et au retour
 function add(a, b) {
   return a + b;
@@ -1040,15 +1091,14 @@ function add(a, b) {
     id: 'challenge_ts_002',
     type: 'challenge',
     title: 'Créer une interface User',
-    description: `Objectif : Crée une interface TypeScript pour représenter un utilisateur.
+    description: `**Objectif**
+Crée une **interface User** avec les propriétés suivantes :
+- \`id\` : number
+- \`name\` : string
+- \`email\` : string
+- \`age\` : number (optionnel)
 
-L'interface doit avoir ces propriétés :
-- id : un nombre (obligatoire)
-- name : une chaîne de caractères (obligatoire)
-- email : une chaîne de caractères (obligatoire)
-- age : un nombre (OPTIONNEL - l'utilisateur peut ne pas avoir renseigné son âge)
-
-Ensuite, crée un objet "user" qui respecte cette interface.`,
+Puis crée un objet \`user\` qui respecte cette interface.`,
     starterCode: `// Crée l'interface User avec les propriétés demandées
 interface User {
   // Ajoute les propriétés ici
@@ -1087,14 +1137,13 @@ const user: User = {
     id: 'challenge_ts_003',
     type: 'challenge',
     title: 'Tableau typé',
-    description: `Objectif : Crée une fonction qui filtre les nombres pairs d'un tableau.
+    description: `**Objectif**
+Crée une fonction qui filtre les **nombres pairs** d'un tableau.
 
-Ce que tu dois faire :
-1. Type le paramètre "numbers" comme un tableau de nombres
-2. Type le retour de la fonction
-3. Implémente la logique de filtrage
-
-Rappel : Un nombre est pair si number % 2 === 0`,
+**Ce que tu dois faire**
+- Type le paramètre \`numbers\` → \`number[]\`
+- Type le retour → \`number[]\`
+- Un nombre pair : \`n % 2 === 0\``,
     starterCode: `// Type les paramètres et le retour, puis implémente
 function filterEven(numbers) {
   // Retourne uniquement les nombres pairs
@@ -1123,20 +1172,15 @@ function filterEven(numbers) {
     id: 'challenge_ts_004',
     type: 'challenge',
     title: 'Fonction générique identity',
-    description: `Objectif : Crée une fonction générique qui retourne son argument sans le modifier.
+    description: `**Objectif**
+Crée une fonction **générique** qui retourne son argument tel quel.
 
-Une fonction générique utilise un "type parameter" (souvent appelé T) qui sera déterminé
-lors de l'appel de la fonction.
+**Syntaxe**
+\`function identity<T>(value: T): T\`
 
-Ce que tu dois faire :
-1. Ajoute un paramètre de type générique <T>
-2. Type le paramètre "value" avec ce type T
-3. Type le retour avec T
-4. Retourne simplement value
-
-Exemple d'utilisation :
-- identity<string>("hello") retourne "hello" (type string)
-- identity<number>(42) retourne 42 (type number)`,
+**Exemples**
+- \`identity("hello")\` → \`"hello"\`
+- \`identity(42)\` → \`42\``,
     starterCode: `// Crée une fonction générique
 function identity(value) {
   // Retourne la valeur telle quelle
@@ -1163,19 +1207,16 @@ function identity(value) {
     id: 'challenge_ts_005',
     type: 'challenge',
     title: 'Type Guard personnalisé',
-    description: `Objectif : Crée un type guard pour vérifier si une valeur est un objet User.
+    description: `**Objectif**
+Crée un **type guard** pour vérifier si une valeur est un User.
 
-Un type guard est une fonction qui retourne un "type predicate" (param is Type).
-Elle permet à TypeScript de "narrow" (réduire) le type après un if.
+**Syntaxe**
+\`function isUser(value: unknown): value is User\`
 
-Ce que tu dois faire :
-1. L'interface User est déjà définie (id: number, name: string)
-2. Crée la fonction isUser qui :
-   - Prend un paramètre "value" de type unknown
-   - Retourne un type predicate : value is User
-   - Vérifie que value est un objet non-null
-   - Vérifie que value a une propriété "id" de type number
-   - Vérifie que value a une propriété "name" de type string`,
+**Vérifications**
+- \`value\` est un objet non-null
+- Propriété \`id\` de type number
+- Propriété \`name\` de type string`,
     starterCode: `interface User {
   id: number;
   name: string;
@@ -1220,18 +1261,13 @@ function isUser(value: unknown): value is User {
     id: 'challenge_ts_006',
     type: 'challenge',
     title: 'Utility Type - Créer Required',
-    description: `Objectif : Implémente ton propre utility type "MyRequired<T>" qui rend toutes les propriétés obligatoires.
+    description: `**Objectif**
+Implémente **MyRequired<T>** : rend toutes les propriétés obligatoires.
 
-C'est l'inverse de Partial<T>. Si une interface a des propriétés optionnelles (?),
-MyRequired<T> doit les rendre obligatoires.
+**Syntaxe**
+\`type MyRequired<T> = { [K in keyof T]-?: T[K] }\`
 
-Ce que tu dois faire :
-1. Crée un mapped type qui itère sur toutes les clés de T
-2. Utilise le modificateur -? pour retirer l'optionalité
-3. Garde le même type pour chaque propriété
-
-Rappel mapped type : { [K in keyof T]: T[K] }
-Le -? retire le ? des propriétés optionnelles.`,
+Le \`-?\` retire l'optionalité des propriétés.`,
     starterCode: `// Implémente MyRequired pour rendre toutes les props obligatoires
 type MyRequired<T> = {
   // Utilise un mapped type avec -?
@@ -1272,16 +1308,14 @@ type FullUser = MyRequired<PartialUser>;`,
     id: 'challenge_ts_007',
     type: 'challenge',
     title: 'Fonction avec Generics contraints',
-    description: `Objectif : Crée une fonction générique getProperty qui récupère une propriété d'un objet de façon type-safe.
+    description: `**Objectif**
+Crée **getProperty** : récupère une propriété de façon type-safe.
 
-La fonction doit :
-1. Prendre un objet de type T
-2. Prendre une clé K qui doit être une clé valide de T (constraint avec keyof)
-3. Retourner la valeur correspondante avec le bon type T[K]
+**Syntaxe**
+\`function getProperty<T, K extends keyof T>(obj: T, key: K): T[K]\`
 
-Exemple :
-getProperty({ name: 'John', age: 30 }, 'name') // retourne 'John' (type string)
-getProperty({ name: 'John', age: 30 }, 'age')  // retourne 30 (type number)`,
+**Exemple**
+\`getProperty({ name: 'John', age: 30 }, 'name')\` → \`'John'\``,
     starterCode: `// Crée la fonction avec les bons types génériques
 function getProperty(obj, key) {
   return obj[key];

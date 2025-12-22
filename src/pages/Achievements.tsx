@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useUserStore } from '@/stores/userStore';
 import { useExerciseStore, getTotalExercisesCount } from '@/stores/exerciseStore';
 import { BADGES } from '@/types/gamification';
+import { getBadgeProgress } from '@/hooks/useBadgeChecker';
 import type { BadgeRarity } from '@/types/gamification';
 import { Trophy, Target, Flame, Zap, Star, Code, CheckCircle, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -34,49 +35,19 @@ export function Achievements() {
     level: { current: user.stats.level, target: 30, label: 'Niveau actuel' },
   };
 
-  // Get badge progress
-  const getBadgeProgress = (badge: typeof BADGES[0]) => {
-    const { requirement } = badge;
-    let current = 0;
-    const target = requirement.value;
-
-    switch (requirement.type) {
-      case 'streak':
-        current = user.stats.currentStreak;
-        break;
-      case 'exercises_completed':
-        current = user.stats.totalExercises;
-        break;
-      case 'xp_earned':
-        current = user.stats.totalXP;
-        break;
-      case 'level_reached':
-        current = user.stats.level;
-        break;
-      case 'speed':
-        // Speed badges are binary - either achieved or not
-        current = 0; // Would need to track fastest completion time
-        break;
-      case 'perfect_score':
-        current = 0; // Would need to track consecutive perfect scores
-        break;
-      case 'category_mastery':
-        // Handle category-specific progress
-        if (requirement.category === 'algorithms') {
-          current = user.stats.totalChallenges;
-        } else if (requirement.category === 'review') {
-          current = user.stats.totalReviews;
-        } else if (requirement.category === 'fetch') {
-          // Count fetch exercises from completed
-          current = completedExercises.filter(c => {
-            // Approximate - would need exercise type lookup
-            return c.exerciseId.includes('fetch');
-          }).length;
-        }
-        break;
-    }
-
-    return { current, target, percent: Math.min((current / target) * 100, 100) };
+  // Get badge progress using the centralized function
+  const getProgress = (badge: typeof BADGES[0]) => {
+    return getBadgeProgress(badge, {
+      currentStreak: user.stats.currentStreak,
+      totalExercises: user.stats.totalExercises,
+      totalXP: user.stats.totalXP,
+      level: user.stats.level,
+      fastestExerciseTime: user.stats.fastestExerciseTime ?? 0,
+      bestPerfectStreak: user.stats.bestPerfectStreak ?? 0,
+      totalChallenges: user.stats.totalChallenges,
+      totalReviews: user.stats.totalReviews,
+      totalFetchExercises: user.stats.totalFetchExercises ?? 0,
+    });
   };
 
   // Filter badges
@@ -220,7 +191,7 @@ export function Achievements() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredBadges.map((badge) => {
           const isEarned = user.earnedBadges.includes(badge.id);
-          const progress = getBadgeProgress(badge);
+          const progress = getProgress(badge);
 
           return (
             <Card

@@ -1,9 +1,11 @@
 import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Markdown } from '@/components/ui/markdown';
 import { Play, CheckCircle, XCircle, Lightbulb, Clock, Cpu, Eye, RotateCcw, Loader2 } from 'lucide-react';
+import type { Monaco } from '@monaco-editor/react';
 
 // Lazy load Monaco Editor for code splitting
 const Editor = lazy(() => import('@monaco-editor/react'));
@@ -51,10 +53,33 @@ export function CodeChallenge({ exercise, onComplete }: CodeChallengeProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [hasCompleted, setHasCompleted] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [currentHintIndex, setCurrentHintIndex] = useState(0);
   const [showSolution, setShowSolution] = useState(false);
   const [startTime] = useState(Date.now());
+  // Configure Monaco TypeScript on mount
+  const handleEditorDidMount = (_editor: unknown, monaco: Monaco) => {
+
+    // Configure TypeScript compiler options
+    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+      target: monaco.languages.typescript.ScriptTarget.ES2020,
+      allowNonTsExtensions: true,
+      moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+      module: monaco.languages.typescript.ModuleKind.ESNext,
+      noEmit: true,
+      esModuleInterop: true,
+      strict: true,
+      skipLibCheck: true,
+      allowJs: true,
+    });
+
+    // Enable TypeScript diagnostics
+    monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: false,
+      noSyntaxValidation: false,
+    });
+  };
 
   // Save code to localStorage whenever it changes
   useEffect(() => {
@@ -155,6 +180,8 @@ export function CodeChallenge({ exercise, onComplete }: CodeChallengeProps) {
   }, [code, exercise.testCases]);
 
   const handleComplete = () => {
+    if (isSubmitted) return;
+    setIsSubmitted(true);
     const timeSpent = Math.round((Date.now() - startTime) / 1000);
     const allPassed = testResults.every((r) => r.passed);
     const xpEarned = allPassed ? XP_REWARDS.challenge_complete : XP_REWARDS.challenge_partial;
@@ -195,7 +222,7 @@ export function CodeChallenge({ exercise, onComplete }: CodeChallengeProps) {
             </div>
           </div>
           <CardTitle>{exercise.title}</CardTitle>
-          <CardDescription>{exercise.description}</CardDescription>
+          <Markdown className="mt-2">{exercise.description}</Markdown>
         </CardHeader>
 
         <CardContent className="space-y-4">
@@ -362,7 +389,7 @@ export function CodeChallenge({ exercise, onComplete }: CodeChallengeProps) {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <div className="border rounded-lg overflow-hidden h-[350px]">
+          <div className="border rounded-lg overflow-hidden h-[500px]">
             <Suspense fallback={
               <div className="h-full flex items-center justify-center bg-slate-900">
                 <Loader2 className="w-6 h-6 animate-spin text-violet-500" />
@@ -373,6 +400,7 @@ export function CodeChallenge({ exercise, onComplete }: CodeChallengeProps) {
                 defaultLanguage="typescript"
                 value={code}
                 onChange={(value) => setCode(value || '')}
+                onMount={handleEditorDidMount}
                 theme="vs-dark"
                 options={{
                   minimap: { enabled: false },
@@ -381,6 +409,10 @@ export function CodeChallenge({ exercise, onComplete }: CodeChallengeProps) {
                   scrollBeyondLastLine: false,
                   automaticLayout: true,
                   tabSize: 2,
+                  wordWrap: 'on',
+                  quickSuggestions: true,
+                  suggestOnTriggerCharacters: true,
+                  parameterHints: { enabled: true },
                 }}
               />
             </Suspense>
@@ -398,9 +430,13 @@ export function CodeChallenge({ exercise, onComplete }: CodeChallengeProps) {
             </Button>
 
             {hasCompleted && (
-              <Button onClick={handleComplete} className="flex-1">
+              <Button
+                onClick={handleComplete}
+                disabled={isSubmitted}
+                className="flex-1"
+              >
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Terminer (+{XP_REWARDS.challenge_complete} XP)
+                {isSubmitted ? 'Traitement...' : `Terminer (+${XP_REWARDS.challenge_complete} XP)`}
               </Button>
             )}
           </div>

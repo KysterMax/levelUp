@@ -17,7 +17,12 @@ export interface UserStats {
   totalQuizzes: number;
   totalChallenges: number;
   totalReviews: number;
+  totalFetchExercises: number;
   averageScore: number;
+  // Badge tracking
+  fastestExerciseTime: number; // in seconds, 0 = not tracked yet
+  consecutivePerfectScores: number;
+  bestPerfectStreak: number;
 }
 
 export interface DailyProgress {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Markdown } from '@/components/ui/markdown';
 import { CheckCircle, XCircle, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sounds } from '@/lib/sounds';
@@ -16,6 +17,7 @@ interface QuizExerciseProps {
 export function QuizExercise({ exercise, onComplete }: QuizExerciseProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [hasAnswered, setHasAnswered] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
   const [startTime] = useState(Date.now());
 
   const isCorrect = selectedAnswer === exercise.correctIndex;
@@ -37,6 +39,8 @@ export function QuizExercise({ exercise, onComplete }: QuizExerciseProps) {
   };
 
   const handleContinue = () => {
+    if (isCompleted) return;
+    setIsCompleted(true);
     const timeSpent = Math.round((Date.now() - startTime) / 1000);
     const xpEarned = isCorrect ? XP_REWARDS.quiz_correct : XP_REWARDS.quiz_incorrect;
     onComplete(isCorrect, xpEarned, timeSpent);
@@ -57,7 +61,9 @@ export function QuizExercise({ exercise, onComplete }: QuizExerciseProps) {
             {exercise.difficulty}
           </Badge>
         </div>
-        <CardTitle className="text-lg">{exercise.question}</CardTitle>
+        <CardTitle className="text-lg">
+          <Markdown>{exercise.question}</Markdown>
+        </CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-6">
@@ -128,7 +134,7 @@ export function QuizExercise({ exercise, onComplete }: QuizExerciseProps) {
                 <p className="font-medium mb-1">
                   {isCorrect ? 'Correct ! +' + XP_REWARDS.quiz_correct + ' XP' : 'Pas tout à fait...'}
                 </p>
-                <p className="text-sm text-muted-foreground">{exercise.explanation}</p>
+                <Markdown className="text-sm">{exercise.explanation}</Markdown>
               </div>
             </div>
           </div>
@@ -144,8 +150,12 @@ export function QuizExercise({ exercise, onComplete }: QuizExerciseProps) {
               Valider
             </Button>
           ) : (
-            <Button onClick={handleContinue} className="min-w-32">
-              Continuer
+            <Button
+              onClick={handleContinue}
+              disabled={isCompleted}
+              className="min-w-32"
+            >
+              {isCompleted ? 'Traitement...' : 'Continuer'}
             </Button>
           )}
         </div>

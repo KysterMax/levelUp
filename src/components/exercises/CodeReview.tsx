@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Markdown } from '@/components/ui/markdown';
 import { CheckCircle, XCircle, AlertTriangle, Bug, Zap, Palette, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sounds } from '@/lib/sounds';
@@ -30,6 +31,7 @@ const ISSUE_COLORS: Record<IssueType, string> = {
 export function CodeReview({ exercise, onComplete }: CodeReviewProps) {
   const [selectedLines, setSelectedLines] = useState<Set<number>>(new Set());
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
   const [startTime] = useState(Date.now());
 
   const codeLines = exercise.code.split('\n');
@@ -60,6 +62,8 @@ export function CodeReview({ exercise, onComplete }: CodeReviewProps) {
   };
 
   const handleComplete = () => {
+    if (isCompleted) return;
+    setIsCompleted(true);
     const timeSpent = Math.round((Date.now() - startTime) / 1000);
 
     // Calculate score
@@ -111,7 +115,7 @@ export function CodeReview({ exercise, onComplete }: CodeReviewProps) {
               {exercise.difficulty}
             </Badge>
           </div>
-          <CardDescription>{exercise.description}</CardDescription>
+          <Markdown className="mt-2">{exercise.description}</Markdown>
         </CardHeader>
 
         <CardContent>
@@ -174,11 +178,11 @@ export function CodeReview({ exercise, onComplete }: CodeReviewProps) {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Analyse du code</CardTitle>
-          <CardDescription>
+          <p className="text-sm text-muted-foreground">
             {hasSubmitted
               ? `${selectedLines.size} lignes sélectionnées - ${exercise.issues.length} problèmes à trouver`
               : `Trouve les ${exercise.issues.length} problèmes dans ce code`}
-          </CardDescription>
+          </p>
         </CardHeader>
 
         <CardContent className="space-y-4">
@@ -259,8 +263,12 @@ export function CodeReview({ exercise, onComplete }: CodeReviewProps) {
                 })}
               </div>
 
-              <Button onClick={handleComplete} className="w-full">
-                Continuer
+              <Button
+                onClick={handleComplete}
+                disabled={isCompleted}
+                className="w-full"
+              >
+                {isCompleted ? 'Traitement...' : 'Continuer'}
               </Button>
             </>
           )}

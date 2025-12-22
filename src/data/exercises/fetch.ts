@@ -6,20 +6,24 @@ export const fetchExercises: FetchChallenge[] = [
     id: 'fetch_001',
     type: 'fetch',
     title: 'Récupérer des utilisateurs',
-    description: `Objectif : Faire ta première requête HTTP avec fetch().
+    description: `## Objectif
+Faire ta **première requête HTTP** avec \`fetch()\`.
 
-Ce que tu dois faire :
-1. Utilise fetch() pour appeler l'API
-2. Attends la réponse avec await
-3. Convertis la réponse en JSON avec .json()
+## Ce que tu dois faire
+1. Utilise \`fetch()\` pour appeler l'API
+2. Attends la réponse avec \`await\`
+3. Convertis la réponse en JSON avec \`.json()\`
 4. Retourne les données
 
-L'API JSONPlaceholder est une API gratuite pour s'entraîner.
-L'endpoint te retournera un tableau d'utilisateurs.
+## API utilisée
+**JSONPlaceholder** - une API gratuite pour s'entraîner.
 
-Rappel syntaxe :
+## Syntaxe de base
+\`\`\`typescript
 const response = await fetch(url);
-const data = await response.json();`,
+const data = await response.json();
+return data;
+\`\`\``,
     endpoint: 'https://jsonplaceholder.typicode.com/users',
     method: 'GET',
     starterCode: `async function getUsers() {
@@ -53,8 +57,14 @@ const data = await response.json();`,
     id: 'fetch_002',
     type: 'fetch',
     title: 'Récupérer un post spécifique',
-    description:
-      'Récupère le post avec l\'id 1 depuis JSONPlaceholder.',
+    description: `## Objectif
+Récupère le **post avec l'id 1** depuis JSONPlaceholder.
+
+## Endpoint
+\`https://jsonplaceholder.typicode.com/posts/1\`
+
+## Résultat attendu
+Un **objet** (pas un tableau) contenant : \`id\`, \`title\`, \`body\`, \`userId\``,
     endpoint: 'https://jsonplaceholder.typicode.com/posts/1',
     method: 'GET',
     starterCode: `async function getData() {
@@ -86,8 +96,16 @@ const data = await response.json();`,
     id: 'fetch_003',
     type: 'fetch',
     title: 'Récupérer les todos',
-    description:
-      'Récupère la liste des todos et filtre uniquement ceux complétés.',
+    description: `## Objectif
+Récupère la liste des todos et **filtre uniquement ceux complétés**.
+
+## Étapes
+1. Fetch tous les todos depuis l'API
+2. Filtre avec \`.filter()\` sur \`completed === true\`
+3. Retourne le tableau filtré
+
+## Résultat attendu
+Un tableau contenant uniquement les todos avec \`completed: true\``,
     endpoint: 'https://jsonplaceholder.typicode.com/todos',
     method: 'GET',
     starterCode: `async function getData() {
@@ -121,8 +139,22 @@ const data = await response.json();`,
     id: 'fetch_004',
     type: 'fetch',
     title: 'Créer un nouveau post (POST)',
-    description:
-      'Envoie une requête POST pour créer un nouveau post.',
+    description: `## Objectif
+Envoie une requête **POST** pour créer un nouveau post.
+
+## Données à envoyer
+\`\`\`json
+{
+  "title": "Mon post",
+  "body": "Contenu du post",
+  "userId": 1
+}
+\`\`\`
+
+## Configuration requise
+- Méthode : \`POST\`
+- Header : \`Content-Type: application/json\`
+- Body : \`JSON.stringify(data)\``,
     endpoint: 'https://jsonplaceholder.typicode.com/posts',
     method: 'POST',
     starterCode: `async function postData() {
@@ -167,8 +199,15 @@ const data = await response.json();`,
     id: 'fetch_005',
     type: 'fetch',
     title: 'Mettre à jour un post (PUT)',
-    description:
-      'Utilise PUT pour mettre à jour le titre du post 1.',
+    description: `## Objectif
+Utilise **PUT** pour mettre à jour le post 1.
+
+## Différence PUT vs PATCH
+- **PUT** : remplace **toute** la ressource
+- **PATCH** : modifie partiellement
+
+## Données à envoyer
+Toutes les propriétés : \`id\`, \`title\`, \`body\`, \`userId\``,
     endpoint: 'https://jsonplaceholder.typicode.com/posts/1',
     method: 'PUT',
     starterCode: `async function updateData() {
@@ -213,8 +252,13 @@ const data = await response.json();`,
     id: 'fetch_006',
     type: 'fetch',
     title: 'Supprimer un post (DELETE)',
-    description:
-      'Supprime le post avec l\'id 1.',
+    description: `## Objectif
+Supprime le post avec l'id 1 via une requête **DELETE**.
+
+## Particularités
+- Pas besoin de \`body\`
+- Pas besoin de \`Content-Type\`
+- JSONPlaceholder retourne \`{}\` en cas de succès`,
     endpoint: 'https://jsonplaceholder.typicode.com/posts/1',
     method: 'DELETE',
     starterCode: `async function deleteData() {
@@ -248,8 +292,17 @@ const data = await response.json();`,
     id: 'fetch_007',
     type: 'fetch',
     title: 'Gestion des erreurs',
-    description:
-      'Récupère des données et gère les erreurs HTTP correctement.',
+    description: `## Objectif
+Récupère des données et **gère les erreurs HTTP** correctement.
+
+## Ce que tu dois faire
+1. Vérifie \`response.ok\` après le fetch
+2. Si \`false\`, lance une erreur avec le status
+3. Si \`true\`, retourne les données
+
+## Pourquoi c'est important
+\`fetch()\` ne rejette **pas** sur les erreurs HTTP (404, 500...).
+Il faut vérifier manuellement !`,
     endpoint: 'https://jsonplaceholder.typicode.com/users/1',
     method: 'GET',
     starterCode: `async function fetchData() {
@@ -289,8 +342,24 @@ const data = await response.json();`,
     id: 'fetch_008',
     type: 'fetch',
     title: 'Requêtes parallèles',
-    description:
-      'Récupère les utilisateurs ET les posts en parallèle avec Promise.all.',
+    description: `## Objectif
+Récupère **users ET posts en parallèle** avec \`Promise.all\`.
+
+## Pourquoi en parallèle ?
+\`\`\`typescript
+// ❌ Séquentiel - lent (2x le temps)
+const users = await fetchUsers();
+const posts = await fetchPosts();
+
+// ✅ Parallèle - rapide
+const [users, posts] = await Promise.all([
+  fetchUsers(),
+  fetchPosts()
+]);
+\`\`\`
+
+## Résultat attendu
+\`{ users: [...], posts: [...] }\``,
     endpoint: 'https://jsonplaceholder.typicode.com/users',
     method: 'GET',
     starterCode: `async function getData() {
@@ -332,8 +401,21 @@ const data = await response.json();`,
     id: 'fetch_009',
     type: 'fetch',
     title: 'Fetch avec Timeout',
-    description:
-      'Implémente un fetch avec un timeout de 5 secondes.',
+    description: `## Objectif
+Implémente un fetch avec un **timeout de 5 secondes**.
+
+## Comment faire
+Utilise \`AbortController\` pour annuler la requête :
+
+\`\`\`typescript
+const controller = new AbortController();
+setTimeout(() => controller.abort(), 5000);
+
+fetch(url, { signal: controller.signal });
+\`\`\`
+
+## Gestion d'erreur
+Si timeout → \`error.name === 'AbortError'\``,
     endpoint: 'https://jsonplaceholder.typicode.com/users',
     method: 'GET',
     starterCode: `async function fetchData() {
@@ -380,8 +462,24 @@ const data = await response.json();`,
     id: 'fetch_010',
     type: 'fetch',
     title: 'Fetch avec Retry',
-    description:
-      'Implémente un fetch qui réessaie 3 fois en cas d\'échec.',
+    description: `## Objectif
+Implémente un fetch avec **retry automatique** (3 tentatives max).
+
+## Pattern Retry
+\`\`\`typescript
+for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  try {
+    return await fetch(url);
+  } catch (error) {
+    if (attempt === maxRetries) throw error;
+    await delay(1000); // Attendre avant retry
+  }
+}
+\`\`\`
+
+## Paramètres
+- **3 tentatives** maximum
+- **1 seconde** de délai entre chaque essai`,
     endpoint: 'https://jsonplaceholder.typicode.com/users',
     method: 'GET',
     starterCode: `async function getData() {

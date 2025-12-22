@@ -6,8 +6,16 @@ export const reviewExercises: CodeReview[] = [
     id: 'review_001',
     type: 'review',
     title: 'Fetch API Issues',
-    description:
-      'Ce code fait un appel API mais contient plusieurs problèmes. Trouve-les tous !',
+    description: `## Mission
+Ce code fait un appel API mais contient **plusieurs problèmes**. Trouve-les tous !
+
+## Indices
+Cherche les erreurs liées à :
+- \`async/await\`
+- Méthodes HTTP
+- Format des données
+
+> **Clique sur les lignes** que tu penses problématiques`,
     code: `async function fetchUsers() {
   const response = fetch('/api/users');
   const data = response.json();
@@ -66,8 +74,14 @@ async function updateUser(id, name) {
     id: 'review_002',
     type: 'review',
     title: 'Array Methods Mistakes',
-    description:
-      'Ce code manipule des tableaux mais contient des erreurs courantes.',
+    description: `## Mission
+Ce code manipule des **tableaux** mais contient des erreurs courantes.
+
+## Types d'erreurs à chercher
+- Comparaison vs Affectation
+- Return manquants
+- Syntaxe de callbacks
+- Mutations non désirées`,
     code: `function processUsers(users) {
   // Trouve l'utilisateur admin
   const admin = users.find(u => u.role = 'admin');
@@ -120,8 +134,13 @@ async function updateUser(id, name) {
     id: 'review_003',
     type: 'review',
     title: 'Variable Scope Issues',
-    description:
-      'Ce code a des problèmes de portée de variables.',
+    description: `## Mission
+Ce code a des problèmes de **portée de variables** (scope).
+
+## Concepts clés
+- \`var\` → portée **fonction**
+- \`let/const\` → portée **bloc**
+- Closures dans les boucles`,
     code: `function getUserData() {
   if (true) {
     var username = 'john';
@@ -168,8 +187,14 @@ async function updateUser(id, name) {
     id: 'review_004',
     type: 'review',
     title: 'Promise Handling Errors',
-    description:
-      'Ce code gère des Promises mais avec plusieurs anti-patterns.',
+    description: `## Mission
+Ce code gère des **Promises** mais avec plusieurs anti-patterns.
+
+## Anti-patterns courants
+- Requêtes séquentielles inutiles
+- Erreurs ignorées silencieusement
+- Promise constructor anti-pattern
+- Gestion d'erreurs incomplète`,
     code: `async function loadData() {
   try {
     const users = await fetchUsers();
@@ -239,8 +264,14 @@ function getUser(id) {
     id: 'review_005',
     type: 'review',
     title: 'React Component Issues',
-    description:
-      'Ce composant React contient plusieurs problèmes de performance et de logique.',
+    description: `## Mission
+Ce composant **React** contient plusieurs problèmes de performance et de logique.
+
+## Problèmes à chercher
+- \`useEffect\` mal configuré
+- Mutations d'état
+- Props manquantes
+- Props inutilisées`,
     code: `import { useState, useEffect } from 'react';
 
 function UserList({ userId }) {
@@ -308,8 +339,14 @@ function UserList({ userId }) {
     id: 'review_006',
     type: 'review',
     title: 'TypeScript Type Issues',
-    description:
-      'Ce code TypeScript a des problèmes de typage.',
+    description: `## Mission
+Ce code **TypeScript** a des problèmes de typage.
+
+## Erreurs typiques
+- Utilisation de \`any\`
+- Propriétés optionnelles non vérifiées
+- Types incompatibles
+- Retours de fonction incorrects`,
     code: `interface User {
   id: number;
   name: string;
@@ -374,8 +411,14 @@ const users: User[] = [
     id: 'review_007',
     type: 'review',
     title: 'Security Vulnerabilities',
-    description:
-      'Ce code contient des failles de sécurité. Identifie-les.',
+    description: `## Mission
+Ce code contient des **failles de sécurité critiques**. Identifie-les !
+
+## Vulnérabilités OWASP à chercher
+- **SQL Injection** - concaténation de requêtes
+- **XSS** - injection de HTML
+- **eval()** - exécution de code arbitraire
+- **Stockage sensible** - données en clair`,
     code: `app.get('/user/:id', (req, res) => {
   const query = 'SELECT * FROM users WHERE id = ' + req.params.id;
   db.execute(query);
@@ -427,8 +470,13 @@ localStorage.setItem('creditCard', cardNumber);`,
     id: 'review_008',
     type: 'review',
     title: 'Performance Anti-patterns',
-    description:
-      'Ce code a des problèmes de performance significatifs.',
+    description: `## Mission
+Ce code a des problèmes de **performance significatifs**.
+
+## Anti-patterns à identifier
+- Complexité **O(n²)** évitable
+- DOM manipulation répétée
+- Sérialisation coûteuse`,
     code: `function processData(items) {
   let result = [];
 
@@ -478,8 +526,15 @@ localStorage.setItem('creditCard', cardNumber);`,
     id: 'review_009',
     type: 'review',
     title: 'Clean Code Violations',
-    description:
-      'Ce code viole plusieurs principes de clean code.',
+    description: `## Mission
+Ce code viole plusieurs principes de **Clean Code**.
+
+## Violations à identifier
+- Trop de paramètres
+- Noms non descriptifs
+- **Arrow anti-pattern** (if imbriqués)
+- Code mort
+- **God Class** (fait trop de choses)`,
     code: `function calc(a, b, c, d, e, f, g, h) {
   let x = 0;
   if (a > 0) {

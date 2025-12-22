@@ -1,9 +1,18 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useUserStore } from '@/stores/userStore';
+import { useBadgeChecker } from '@/hooks/useBadgeChecker';
 import { XPBar, LevelIndicator, StreakCounter, LevelUpNotification } from '@/components/gamification';
-import { Home, BookOpen, Trophy, User, Menu, X, BarChart3, Crown } from 'lucide-react';
+import { Home, BookOpen, Trophy, User, Menu, X, BarChart3, Crown, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -22,8 +31,18 @@ const NAV_ITEMS = [
 
 export function MainLayout({ children }: MainLayoutProps) {
   const user = useUserStore((state) => state.user);
+  const resetProgress = useUserStore((state) => state.resetProgress);
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Check and unlock badges automatically
+  useBadgeChecker();
+
+  const handleLogout = () => {
+    resetProgress();
+    navigate('/');
+  };
 
   if (!user) return null;
 
@@ -65,7 +84,41 @@ export function MainLayout({ children }: MainLayoutProps) {
               <div className="hidden lg:block">
                 <StreakCounter size="sm" />
               </div>
-              <LevelIndicator size="sm" showTitle={false} />
+
+              {/* User Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="cursor-pointer focus:outline-none">
+                    <LevelIndicator size="sm" showTitle={false} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{user.username}</span>
+                      <span className="text-xs text-muted-foreground">
+                        Niveau {user.stats.level}
+                      </span>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Mon Profil
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer text-destructive focus:text-destructive"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Se déconnecter
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <ThemeToggle />
 
               {/* Mobile Menu Button */}
@@ -105,6 +158,17 @@ export function MainLayout({ children }: MainLayoutProps) {
                   </Button>
                 </Link>
               ))}
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleLogout();
+                }}
+              >
+                <LogOut className="w-4 h-4" />
+                Se déconnecter
+              </Button>
             </nav>
             <div className="container mx-auto px-4 pb-3">
               <XPBar />

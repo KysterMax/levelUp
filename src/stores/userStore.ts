@@ -33,18 +33,38 @@ function getTodayString(): string {
   return new Date().toISOString().split('T')[0];
 }
 
-function createInitialStats(): UserStats {
+function getInitialXPForLevel(difficulty: Difficulty): number {
+  switch (difficulty) {
+    case 'senior':
+      return 2000; // Level 11 - Mid Developer
+    case 'mid':
+      return 700; // Level 6 - Junior Developer
+    case 'junior':
+    default:
+      return 0; // Level 1 - Junior Padawan
+  }
+}
+
+function createInitialStats(initialLevel: Difficulty): UserStats {
+  const initialXP = getInitialXPForLevel(initialLevel);
+  const { level, title } = getLevelFromXP(initialXP);
+
   return {
-    totalXP: 0,
-    level: 1,
-    title: 'junior-padawan',
+    totalXP: initialXP,
+    level,
+    title,
     currentStreak: 0,
     longestStreak: 0,
     totalExercises: 0,
     totalQuizzes: 0,
     totalChallenges: 0,
     totalReviews: 0,
+    totalFetchExercises: 0,
     averageScore: 0,
+    // Badge tracking
+    fastestExerciseTime: 0,
+    consecutivePerfectScores: 0,
+    bestPerfectStreak: 0,
   };
 }
 
@@ -73,7 +93,7 @@ function createInitialUser(username: string, initialLevel: Difficulty, customUnl
     createdAt: new Date(),
     lastActiveAt: new Date(),
     initialLevel,
-    stats: createInitialStats(),
+    stats: createInitialStats(initialLevel),
     exerciseResults: {},
     dailyProgress: [],
     unlockedPaths,
@@ -144,10 +164,30 @@ export const useUserStore = create<UserState>()(
 
         if (exerciseType === 'quiz') {
           statsUpdate.totalQuizzes = user.stats.totalQuizzes + 1;
-        } else if (exerciseType === 'challenge' || exerciseType === 'fetch') {
+        } else if (exerciseType === 'challenge') {
           statsUpdate.totalChallenges = user.stats.totalChallenges + 1;
+        } else if (exerciseType === 'fetch') {
+          statsUpdate.totalFetchExercises = user.stats.totalFetchExercises + 1;
         } else if (exerciseType === 'review') {
           statsUpdate.totalReviews = user.stats.totalReviews + 1;
+        }
+
+        // Track fastest time (only if completed successfully and time > 0)
+        if (result.timeSpent > 0 && result.score >= 80) {
+          const currentFastest = user.stats.fastestExerciseTime;
+          if (currentFastest === 0 || result.timeSpent < currentFastest) {
+            statsUpdate.fastestExerciseTime = result.timeSpent;
+          }
+        }
+
+        // Track perfect scores streak
+        const isPerfect = result.score === 100;
+        if (isPerfect) {
+          const newStreak = user.stats.consecutivePerfectScores + 1;
+          statsUpdate.consecutivePerfectScores = newStreak;
+          statsUpdate.bestPerfectStreak = Math.max(user.stats.bestPerfectStreak, newStreak);
+        } else {
+          statsUpdate.consecutivePerfectScores = 0;
         }
 
         set({
