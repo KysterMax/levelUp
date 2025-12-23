@@ -290,18 +290,18 @@ export function CodeChallenge({ exercise, onComplete }: CodeChallengeProps) {
                         )
                       )}
                     </div>
-                    <p className="font-mono text-xs text-muted-foreground">
-                      Input: {JSON.stringify(testCase.input)}
-                    </p>
-                    <p className="font-mono text-xs text-muted-foreground">
-                      Expected: {JSON.stringify(testCase.expected)}
-                    </p>
+                    <div className="font-mono text-xs text-muted-foreground break-all">
+                      <span className="text-muted-foreground/70">Input:</span> {JSON.stringify(testCase.input)}
+                    </div>
+                    <div className="font-mono text-xs text-muted-foreground break-all">
+                      <span className="text-muted-foreground/70">Expected:</span> {JSON.stringify(testCase.expected)}
+                    </div>
                     {result && !result.passed && (
-                      <p className="font-mono text-xs text-red-600 dark:text-red-400">
+                      <div className="font-mono text-xs text-red-600 dark:text-red-400 break-all mt-1">
                         {result.error
                           ? `Error: ${result.error}`
                           : `Got: ${JSON.stringify(result.received)}`}
-                      </p>
+                      </div>
                     )}
                   </div>
                 );
