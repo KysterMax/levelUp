@@ -124,29 +124,54 @@ export function CodeChallenge({ exercise, onComplete }: CodeChallengeProps) {
 
     for (const testCase of exercise.testCases) {
       try {
-        // Create a function from the user's code
+        // Check for function declaration
         const funcMatch = jsCode.match(/function\s+(\w+)/);
-        if (!funcMatch) {
+
+        // Check for arrow function: const name = (...) =>
+        const arrowMatch = jsCode.match(/(?:const|let|var)\s+(\w+)\s*=\s*(?:\([^)]*\)|[^=])\s*=>/);
+
+        // Check for variable/object declaration: const name = ...
+        const varMatch = jsCode.match(/(?:const|let|var)\s+(\w+)\s*[:=]/);
+
+        let result: unknown;
+
+        if (funcMatch) {
+          // Function declaration
+          const funcName = funcMatch[1];
+          const wrappedCode = `
+            ${jsCode}
+            return ${funcName}(...args);
+          `;
+          const userFunc = new Function('args', wrappedCode);
+          result = userFunc(testCase.input);
+        } else if (arrowMatch) {
+          // Arrow function
+          const funcName = arrowMatch[1];
+          const wrappedCode = `
+            ${jsCode}
+            return ${funcName}(...args);
+          `;
+          const userFunc = new Function('args', wrappedCode);
+          result = userFunc(testCase.input);
+        } else if (varMatch) {
+          // Variable/object declaration - evaluate and return the variable
+          const varName = varMatch[1];
+          const wrappedCode = `
+            ${jsCode}
+            return ${varName};
+          `;
+          const evalFunc = new Function(wrappedCode);
+          result = evalFunc();
+        } else {
           results.push({
             passed: false,
             expected: testCase.expected,
             received: undefined,
             description: testCase.description,
-            error: 'Aucune fonction trouvée dans le code',
+            error: 'Aucune fonction ou variable trouvée dans le code',
           });
           continue;
         }
-
-        const funcName = funcMatch[1];
-
-        // Safely evaluate the code
-        const wrappedCode = `
-          ${jsCode}
-          return ${funcName}(...args);
-        `;
-
-        const userFunc = new Function('args', wrappedCode);
-        const result = userFunc(testCase.input);
 
         const passed = JSON.stringify(result) === JSON.stringify(testCase.expected);
 
