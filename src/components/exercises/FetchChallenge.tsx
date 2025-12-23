@@ -289,7 +289,13 @@ export function FetchChallenge({ exercise, onComplete }: FetchChallengeProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCode(exercise.solution)}
+                    onClick={() => {
+                      setCode(exercise.solution);
+                      // Reset states to allow re-execution
+                      setFetchResult(null);
+                      setHasCompleted(false);
+                      setIsSubmitted(false);
+                    }}
                     className="w-full"
                   >
                     Copier dans l'éditeur

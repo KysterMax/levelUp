@@ -331,7 +331,13 @@ export function CodeChallenge({ exercise, onComplete }: CodeChallengeProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCode(exercise.solution)}
+                    onClick={() => {
+                      setCode(exercise.solution);
+                      // Reset states to allow re-execution
+                      setTestResults([]);
+                      setHasCompleted(false);
+                      setIsSubmitted(false);
+                    }}
                     className="w-full"
                   >
                     Copier dans l'éditeur
