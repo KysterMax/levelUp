@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { QuizExercise, CodeChallenge, CodeReview, FetchChallenge } from '@/components/exercises';
+import { QuizExercise, CodeChallenge, CodeReview, FetchChallenge, ExerciseCompleteModal } from '@/components/exercises';
 import { XPGainAnimation } from '@/components/gamification';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useCompleteExercise } from '@/hooks/useCompleteExercise';
@@ -32,6 +32,8 @@ export function Exercise() {
   const [isLoading, setIsLoading] = useState(true);
   const [showXPAnimation, setShowXPAnimation] = useState(false);
   const [earnedXP, setEarnedXP] = useState(0);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [lastSuccess, setLastSuccess] = useState(false);
 
   // Check URL params
   const isDailyChallenge = searchParams.get('daily') === 'true';
@@ -115,11 +117,29 @@ export function Exercise() {
     // Update user stats (async) - wait for it to complete
     await completeUserExercise(result);
 
-    // Navigate back to dashboard after a short delay
+    // Store success state and show completion modal after animation
+    setLastSuccess(success);
     setTimeout(() => {
-      navigate('/dashboard');
-    }, 1500);
+      setShowCompleteModal(true);
+    }, 1000);
   };
+
+  const handleContinueExercise = () => {
+    setShowCompleteModal(false);
+    handleNextExercise();
+  };
+
+  const handleGoToDashboard = () => {
+    setShowCompleteModal(false);
+    navigate('/dashboard');
+  };
+
+  // Check if there are more exercises of this type
+  const hasMoreExercises = exercise
+    ? !!(isTrainingMode
+        ? getTrainingExercise(exercise.type)
+        : getNewExercise(exercise.type, userLevel))
+    : false;
 
   const handleNextExercise = () => {
     if (!exercise) return;
@@ -237,8 +257,18 @@ export function Exercise() {
         </div>
       )}
 
+      {/* Completion Modal */}
+      <ExerciseCompleteModal
+        open={showCompleteModal}
+        success={lastSuccess}
+        xpEarned={earnedXP}
+        hasMoreExercises={hasMoreExercises}
+        onContinue={handleContinueExercise}
+        onDashboard={handleGoToDashboard}
+      />
+
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => navigate(-1)}>
+        <Button variant="ghost" onClick={() => navigate('/dashboard')}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Retour
         </Button>
