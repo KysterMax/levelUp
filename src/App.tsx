@@ -20,6 +20,7 @@ const Statistics = lazy(() => import('@/pages/Statistics').then(m => ({ default:
 const Settings = lazy(() => import('@/pages/Settings').then(m => ({ default: m.Settings })));
 const Series = lazy(() => import('@/pages/Series').then(m => ({ default: m.Series })));
 const Leaderboard = lazy(() => import('@/pages/Leaderboard').then(m => ({ default: m.Leaderboard })));
+const ResetPassword = lazy(() => import('@/pages/ResetPassword').then(m => ({ default: m.ResetPassword })));
 
 // Loading fallback component
 function PageLoader() {
@@ -90,10 +91,13 @@ function App() {
         <Routes>
           {/* Auth page - only when Supabase is configured */}
           {isSupabaseConfigured() && (
-            <Route
-              path="/auth"
-              element={isAuthenticated ? <Navigate to={hasCompletedOnboarding ? '/dashboard' : '/onboarding'} replace /> : <Auth />}
-            />
+            <>
+              <Route
+                path="/auth"
+                element={isAuthenticated ? <Navigate to={hasCompletedOnboarding ? '/dashboard' : '/onboarding'} replace /> : <Auth />}
+              />
+              <Route path="/reset-password" element={<ResetPassword />} />
+            </>
           )}
 
           {/* Onboarding */}
