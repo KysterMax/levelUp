@@ -94,7 +94,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         .from('profiles')
         .select('username')
         .eq('username', username)
-        .single();
+        .maybeSingle();
 
       if (existingUser) {
         set({ isLoading: false });
@@ -240,7 +240,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .select('username')
       .eq('username', username)
       .neq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (existingUser) {
       return { error: 'Ce nom d\'utilisateur est déjà pris' };
@@ -293,7 +293,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (data) {
       set({ profile: data });
@@ -308,7 +308,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .from('user_stats')
       .select('*')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (data) {
       set({ stats: data });
@@ -323,7 +323,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .from('user_settings')
       .select('*')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (data) {
       set({ settings: data });
