@@ -125,7 +125,13 @@ export function Exercise() {
   };
 
   const handleContinueExercise = () => {
+    // Reset all completion state
     setShowCompleteModal(false);
+    setShowXPAnimation(false);
+    setEarnedXP(0);
+    setLastSuccess(false);
+
+    // Move to next exercise
     handleNextExercise();
   };
 
@@ -282,6 +288,7 @@ export function Exercise() {
 
       {exercise.type === 'quiz' && (
         <QuizExercise
+          key={exercise.id}
           exercise={exercise}
           onComplete={(correct, xp, time) => handleComplete(correct, xp, time)}
         />
@@ -289,6 +296,7 @@ export function Exercise() {
 
       {exercise.type === 'challenge' && (
         <CodeChallenge
+          key={exercise.id}
           exercise={exercise}
           onComplete={(success, xp, time) => handleComplete(success, xp, time)}
         />
@@ -296,6 +304,7 @@ export function Exercise() {
 
       {exercise.type === 'review' && (
         <CodeReview
+          key={exercise.id}
           exercise={exercise}
           onComplete={(score, xp, time) => handleComplete(score >= 80, xp, time)}
         />
@@ -303,6 +312,7 @@ export function Exercise() {
 
       {exercise.type === 'fetch' && (
         <FetchChallenge
+          key={exercise.id}
           exercise={exercise}
           onComplete={(success, xp, time) => handleComplete(success, xp, time)}
         />

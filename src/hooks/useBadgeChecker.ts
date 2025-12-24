@@ -2,8 +2,33 @@ import { useEffect, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useUserStore } from '@/stores/userStore';
+import { isSupabaseConfigured } from '@/lib/supabase';
 import { BADGES } from '@/types/gamification';
 import type { Badge } from '@/types/gamification';
+
+// LocalStorage key for tracking notified badges
+const NOTIFIED_BADGES_KEY = 'levelup_notified_badges';
+
+// Get notified badges from localStorage
+function getNotifiedBadges(): Set<string> {
+  try {
+    const stored = localStorage.getItem(NOTIFIED_BADGES_KEY);
+    return stored ? new Set(JSON.parse(stored)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+// Save notified badge to localStorage
+function addNotifiedBadge(badgeId: string): void {
+  try {
+    const notified = getNotifiedBadges();
+    notified.add(badgeId);
+    localStorage.setItem(NOTIFIED_BADGES_KEY, JSON.stringify([...notified]));
+  } catch {
+    // Ignore storage errors
+  }
+}
 
 /**
  * Hook that checks and unlocks badges automatically based on user stats.
@@ -13,42 +38,47 @@ export function useBadgeChecker() {
   const user = useCurrentUser();
   const earnBadge = useUserStore((state) => state.earnBadge);
 
-  // Track badges we've already processed in this session to prevent duplicates
-  const processedBadgesRef = useRef<Set<string>>(new Set());
   // Track if we're currently processing to prevent race conditions
   const isProcessingRef = useRef(false);
+  // Track if initial check is done
+  const hasInitializedRef = useRef(false);
 
   const checkBadges = useCallback(() => {
     if (!user || isProcessingRef.current) return;
 
+    // In Supabase mode, don't check badges (earnedBadges is not synced yet)
+    // TODO: Fetch badges from Supabase when implemented
+    if (isSupabaseConfigured()) return;
+
     isProcessingRef.current = true;
 
     const earnedBadges = new Set(user.earnedBadges);
+    const notifiedBadges = getNotifiedBadges();
     const stats = user.stats;
 
     // Check each badge
     BADGES.forEach((badge) => {
       // Skip already earned badges
-      if (earnedBadges.has(badge.id)) {
-        processedBadgesRef.current.add(badge.id);
-        return;
-      }
+      if (earnedBadges.has(badge.id)) return;
 
-      // Skip badges we've already processed in this session
-      if (processedBadgesRef.current.has(badge.id)) return;
+      // Skip badges we've already notified about (persisted in localStorage)
+      if (notifiedBadges.has(badge.id)) return;
 
       const isUnlocked = checkBadgeRequirement(badge, stats);
 
       if (isUnlocked) {
-        // Mark as processed BEFORE calling earnBadge to prevent duplicates
-        processedBadgesRef.current.add(badge.id);
+        // Mark as notified BEFORE calling earnBadge to prevent duplicates
+        addNotifiedBadge(badge.id);
         earnBadge(badge.id);
 
-        // Show toast notification for new badge
-        showBadgeNotification(badge);
+        // Only show notification if not the initial load
+        if (hasInitializedRef.current) {
+          showBadgeNotification(badge);
+        }
       }
     });
 
+    hasInitializedRef.current = true;
     isProcessingRef.current = false;
   }, [user, earnBadge]);
 
