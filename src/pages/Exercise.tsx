@@ -117,11 +117,9 @@ export function Exercise() {
     // Update user stats (async) - wait for it to complete
     await completeUserExercise(result);
 
-    // Store success state and show completion modal after animation
+    // Store success state and show completion modal immediately
     setLastSuccess(success);
-    setTimeout(() => {
-      setShowCompleteModal(true);
-    }, 1000);
+    setShowCompleteModal(true);
   };
 
   const handleContinueExercise = () => {
