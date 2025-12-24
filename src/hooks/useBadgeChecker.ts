@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useUserStore } from '@/stores/userStore';
@@ -13,11 +13,15 @@ export function useBadgeChecker() {
   const user = useCurrentUser();
   const earnBadge = useUserStore((state) => state.earnBadge);
 
-  // Track previously earned badges to detect new ones
-  const previousBadgesRef = useRef<Set<string>>(new Set());
+  // Track badges we've already processed in this session to prevent duplicates
+  const processedBadgesRef = useRef<Set<string>>(new Set());
+  // Track if we're currently processing to prevent race conditions
+  const isProcessingRef = useRef(false);
 
-  useEffect(() => {
-    if (!user) return;
+  const checkBadges = useCallback(() => {
+    if (!user || isProcessingRef.current) return;
+
+    isProcessingRef.current = true;
 
     const earnedBadges = new Set(user.earnedBadges);
     const stats = user.stats;
@@ -25,11 +29,19 @@ export function useBadgeChecker() {
     // Check each badge
     BADGES.forEach((badge) => {
       // Skip already earned badges
-      if (earnedBadges.has(badge.id)) return;
+      if (earnedBadges.has(badge.id)) {
+        processedBadgesRef.current.add(badge.id);
+        return;
+      }
+
+      // Skip badges we've already processed in this session
+      if (processedBadgesRef.current.has(badge.id)) return;
 
       const isUnlocked = checkBadgeRequirement(badge, stats);
 
       if (isUnlocked) {
+        // Mark as processed BEFORE calling earnBadge to prevent duplicates
+        processedBadgesRef.current.add(badge.id);
         earnBadge(badge.id);
 
         // Show toast notification for new badge
@@ -37,9 +49,12 @@ export function useBadgeChecker() {
       }
     });
 
-    // Update previous badges ref
-    previousBadgesRef.current = earnedBadges;
+    isProcessingRef.current = false;
   }, [user, earnBadge]);
+
+  useEffect(() => {
+    checkBadges();
+  }, [checkBadges]);
 }
 
 /**
@@ -115,9 +130,11 @@ function showBadgeNotification(badge: Badge) {
 
   const rarityEmoji = rarityColors[badge.rarity];
 
+  // Use badge ID as toast ID to prevent duplicate notifications
   toast.success(
     `${rarityEmoji} Nouveau badge débloqué !`,
     {
+      id: `badge-${badge.id}`,
       description: `${badge.icon} ${badge.name} - ${badge.description}`,
       duration: 5000,
     }
